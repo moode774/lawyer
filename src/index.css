@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-[#f6f8fa] text-ink selection:bg-[#A7C7E7] selection:text-[#1C2B48];
+    font-family: 'Tajawal', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight text-[#1C2B48];
+    font-family: 'Amiri', serif;
+  }
+  * {
+    @apply border-[#C4D8E5]/60;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-[#8EB1D1] ring-offset-2 ring-offset-background;
+  }
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Font Family Utilities */
+  .font-amiri {
+    font-family: 'Amiri', serif;
+  }
+  .font-reem {
+    font-family: 'Reem Kufi', sans-serif;
+  }
+  .font-tajawal {
+    font-family: 'Tajawal', sans-serif;
+  }
+
+  /* Luxury Palette Utility Classes */
+  .bg-midnight {
+    background-color: #1C2B48;
+  }
+  .text-midnight {
+    color: #1C2B48;
+  }
+  .bg-cerulean {
+    background-color: #8EB1D1;
+  }
+  .text-cerulean {
+    color: #8EB1D1;
+  }
+  .bg-baby-blue {
+    background-color: #A7C7E7;
+  }
+  .text-baby-blue {
+    color: #A7C7E7;
+  }
+  .bg-ice-blue {
+    background-color: #C4D8E5;
+  }
+  .bg-platinum {
+    background-color: #E8ECEF;
+  }
+  
+  /* Luxury Glassmorphism & Gradients */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(196, 216, 229, 0.7);
+  }
+  .glass-dark {
+    background: rgba(28, 43, 72, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(142, 177, 209, 0.25);
+  }
+  .glass-platinum {
+    background: rgba(232, 236, 239, 0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(196, 216, 229, 0.8);
+  }
+  .gradient-midnight {
+    background: linear-gradient(135deg, #1C2B48 0%, #283d63 50%, #131e33 100%);
+  }
+  .gradient-cerulean {
+    background: linear-gradient(135deg, #8EB1D1 0%, #A7C7E7 100%);
+  }
+  .gradient-subtle {
+    background: linear-gradient(180deg, #E8ECEF 0%, #f6f8fa 100%);
+  }
+  .cerulean-glow {
+    box-shadow: 0 0 30px rgba(142, 177, 209, 0.35);
+  }
+  .midnight-shadow {
+    box-shadow: 0 20px 40px -15px rgba(28, 43, 72, 0.25);
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #C4D8E5;
+    border-radius: 9999px;
+  }
+}

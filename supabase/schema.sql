@@ -98,6 +98,9 @@ CREATE TABLE appointments (
     lead_id UUID REFERENCES leads(id) ON DELETE SET NULL,
     client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
     name TEXT NOT NULL,
+    phone TEXT,
+    email TEXT,
+    category TEXT,
     meeting_type TEXT NOT NULL CHECK (meeting_type IN ('office', 'phone', 'video')),
     appointment_date DATE NOT NULL,
     appointment_time TEXT NOT NULL,
@@ -105,7 +108,22 @@ CREATE TABLE appointments (
     status TEXT NOT NULL CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled', 'no_show')),
     location_details TEXT,
     google_calendar_event_id TEXT,
+    notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Public website contact messages (readable only by authenticated staff through RLS)
+CREATE TABLE contact_requests (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    reference_number TEXT UNIQUE NOT NULL,
+    full_name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT,
+    message TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'in_progress', 'replied', 'closed')),
+    source TEXT NOT NULL DEFAULT 'website_contact',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 7. DOCUMENTS

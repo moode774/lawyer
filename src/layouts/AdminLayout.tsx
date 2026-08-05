@@ -8,22 +8,28 @@ import {
   ChartColumn,
   FileText,
   FolderOpen,
+  HandCoins,
   Inbox,
   KanbanSquare,
+  Landmark,
   LayoutDashboard,
   LogOut,
+  Megaphone,
   Menu,
   Search,
   Settings,
   Users,
+  Wallet,
   X,
   Scale,
   Headphones
+  ,ReceiptText, Building2
 } from 'lucide-react'
 import { globalSearch, listNotifications, markAllNotificationsRead, type SearchResult } from '../lib/store'
 import type { NotificationItem } from '../types'
 import { useAuth } from '../lib/auth'
 import { timeAgo, cn } from '../lib/utils'
+import { useSEO } from '../lib/seo'
 import { Avatar } from '../components/ui/avatar'
 import { Logo } from '../components/shared/Logo'
 import { BRAND } from '../config/brand'
@@ -33,13 +39,20 @@ const nav = [
   { to: '/admin/pipeline', icon: KanbanSquare, label: 'خط الصفقات' },
   { to: '/admin/leads', icon: Inbox, label: 'العملاء المحتملون' },
   { to: '/admin/bookings', icon: CalendarDays, label: 'المواعيد' },
+  { to: '/admin/marketing', icon: Megaphone, label: 'مركز التسويق الذكي' },
   { to: '/admin/clients', icon: Users, label: 'العملاء' },
   { to: '/admin/matters', icon: FolderOpen, label: 'القضايا' },
   { to: '/admin/tasks', icon: FileText, label: 'المهام' },
   { to: '/admin/documents', icon: FolderOpen, label: 'المستندات' },
+  { to: '/admin/finance', end: true, icon: Wallet, label: 'الحسابات والمصروفات' },
+  { to: '/admin/finance/reports', icon: Landmark, label: 'التقارير المالية والإقرار' },
+  { to: '/admin/finance/debts', icon: HandCoins, label: 'الذمم والمديونيات' },
+  { to: '/admin/finance/invoices', icon: ReceiptText, label: 'الفواتير والتحصيل' },
+  { to: '/admin/finance/banking', icon: Landmark, label: 'البنوك والتسوية' },
   { to: '/admin/analytics', icon: ChartColumn, label: 'التقارير' },
   { to: '/admin/ai', icon: Bot, label: 'المساعد الذكي' },
   { to: '/admin/settings', icon: Settings, label: 'الإعدادات' },
+  { to: '/admin/settings/office', icon: Building2, label: 'بيانات المكتب والنسخ' },
 ]
 
 function GlobalSearch() {
@@ -212,8 +225,11 @@ export default function AdminLayout() {
   const { pathname } = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  // لوحة الإدارة خاصة — لا تُفهرس إطلاقًا
+  useSEO({ title: 'لوحة إدارة المكتب', noindex: true })
+
   useEffect(() => {
-    if (!user || user.role !== 'admin') navigate('/login', { replace: true })
+    if (!user || user.role !== 'admin') navigate('/admin-login', { replace: true })
   }, [user, navigate])
 
   useEffect(() => setMobileOpen(false), [pathname])
@@ -224,7 +240,7 @@ export default function AdminLayout() {
     <div className="flex h-full flex-col font-tajawal bg-[#1C2B48]">
       <div className="flex flex-col items-center justify-center p-6 border-b border-[#8EB1D1]/20 text-center">
         <div className="size-16 rounded-2xl bg-[#1C2B48] mb-3 shadow-lg border border-[#8EB1D1]/40 flex items-center justify-center overflow-hidden shrink-0">
-          <img src="/icons.png" alt="بن نوح" className="w-full h-full object-cover scale-110" />
+          <img src="/icons.webp" alt="بن نوح" className="w-full h-full object-cover scale-110" />
         </div>
         <h2 className="font-amiri text-2xl font-bold text-white leading-tight">
           {BRAND.shortNameAr}
@@ -314,7 +330,7 @@ export default function AdminLayout() {
 
             <div className="hidden sm:flex items-center gap-3">
               <div className="size-11 rounded-2xl bg-[#1C2B48] shadow-sm border border-[#8EB1D1]/40 flex items-center justify-center overflow-hidden shrink-0">
-                <img src="/icons.png" alt="أستاذ بن نوح" className="w-full h-full object-cover scale-110" />
+                <img src="/icons.webp" alt="أستاذ بن نوح" className="w-full h-full object-cover scale-110" />
               </div>
               <div>
                 <h3 className="font-bold text-[#1C2B48] text-sm">مرحباً، أستاذ بن نوح المحامي</h3>

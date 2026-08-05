@@ -20,7 +20,7 @@ import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { useSEO } from '../../lib/seo'
-import { store } from '../../lib/store'
+import { listAppointments, listLeads, store } from '../../lib/store'
 import type { Appointment, Client, Lead, Matter, Task, Activity } from '../../types'
 
 export default function DashboardPage() {
@@ -28,10 +28,10 @@ export default function DashboardPage() {
   useSEO({ title: 'مركز العمليات | ' + BRAND.nameAr })
 
   // Live Dynamic Data Queries from Store
-  const { data: leads = [] } = useQuery<Lead[]>({ queryKey: ['leads'], queryFn: () => store.getLeads() })
+  const { data: leads = [] } = useQuery<Lead[]>({ queryKey: ['leads'], queryFn: listLeads })
   const { data: clients = [] } = useQuery<Client[]>({ queryKey: ['clients'], queryFn: () => store.getClients() })
   const { data: matters = [] } = useQuery<Matter[]>({ queryKey: ['matters'], queryFn: () => store.getMatters() })
-  const { data: appointments = [] } = useQuery<Appointment[]>({ queryKey: ['appointments'], queryFn: () => store.getAppointments() })
+  const { data: appointments = [] } = useQuery<Appointment[]>({ queryKey: ['appointments'], queryFn: () => listAppointments() })
   const { data: tasks = [] } = useQuery<Task[]>({ queryKey: ['tasks'], queryFn: () => store.getTasks() })
   const { data: activities = [] } = useQuery<Activity[]>({ queryKey: ['activities'], queryFn: () => store.getActivities() })
 
@@ -47,7 +47,7 @@ export default function DashboardPage() {
       <div className="relative overflow-hidden rounded-[2rem] border border-[#d6e3ee] shadow-sm min-h-[220px] sm:min-h-[260px] flex items-center p-6 sm:p-10">
         {/* Full Banner Image Background - Sharp & Native */}
         <img
-          src="/hero-banner.png"
+          src="/hero-banner.webp"
           alt="Hero Background"
           className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
         />

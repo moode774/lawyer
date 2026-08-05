@@ -15,18 +15,19 @@ const HomePage = lazy(() => import('./pages/public/HomePage'))
 const AboutPage = lazy(() => import('./pages/public/AboutPage'))
 const ServicesPage = lazy(() => import('./pages/public/ServicesPage'))
 const ServiceDetailPage = lazy(() => import('./pages/public/ServiceDetailPage'))
-const LawyerPage = lazy(() => import('./pages/public/LawyerPage'))
 const InsightsPage = lazy(() => import('./pages/public/InsightsPage'))
 const ArticlePage = lazy(() => import('./pages/public/ArticlePage'))
 const FaqPage = lazy(() => import('./pages/public/FaqPage'))
 const ContactPage = lazy(() => import('./pages/public/ContactPage'))
 const PrivacyPage = lazy(() => import('./pages/public/PrivacyPage'))
 const TermsPage = lazy(() => import('./pages/public/TermsPage'))
+const NotFoundPage = lazy(() => import('./pages/public/NotFoundPage'))
 
-// Acquisition
+// Acquisition & Auth
 const BookPage = lazy(() => import('./pages/BookPage'))
 const IntakePage = lazy(() => import('./pages/IntakePage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
+const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'))
 
 // Admin
 const DashboardPage = lazy(() => import('./pages/admin/DashboardPage'))
@@ -43,6 +44,13 @@ const DocumentsPage = lazy(() => import('./pages/admin/DocumentsPage'))
 const AnalyticsPage = lazy(() => import('./pages/admin/AnalyticsPage'))
 const AiPage = lazy(() => import('./pages/admin/AiPage'))
 const SettingsPage = lazy(() => import('./pages/admin/SettingsPage'))
+const MarketingPage = lazy(() => import('./pages/admin/MarketingPage'))
+const FinancePage = lazy(() => import('./pages/admin/FinancePage'))
+const FinanceReportsPage = lazy(() => import('./pages/admin/FinanceReportsPage'))
+const DebtsPage = lazy(() => import('./pages/admin/DebtsPage'))
+const InvoicesPage = lazy(() => import('./pages/admin/InvoicesPage'))
+const BankingPage = lazy(() => import('./pages/admin/BankingPage'))
+const OfficeSettingsPage = lazy(() => import('./pages/admin/OfficeSettingsPage'))
 
 // Portal
 const PortalHomePage = lazy(() => import('./pages/portal/PortalHomePage'))
@@ -51,6 +59,7 @@ const PortalMatterDetailPage = lazy(() => import('./pages/portal/PortalMatterDet
 const PortalDocumentsPage = lazy(() => import('./pages/portal/PortalDocumentsPage'))
 const PortalAppointmentsPage = lazy(() => import('./pages/portal/PortalAppointmentsPage'))
 const PortalMessagesPage = lazy(() => import('./pages/portal/PortalMessagesPage'))
+const PortalInvoicesPage = lazy(() => import('./pages/portal/PortalInvoicesPage'))
 const PortalProfilePage = lazy(() => import('./pages/portal/PortalProfilePage'))
 
 const queryClient = new QueryClient({
@@ -85,7 +94,7 @@ export default function App() {
                       <Route path="/services" element={<ServicesPage />} />
                       <Route path="/services/:slug" element={<ServiceDetailPage />} />
                       <Route path="/lawyer" element={<Navigate to="/about" replace />} />
-                      <Route path="/insights" element={<Navigate to="/about" replace />} />
+                      <Route path="/insights" element={<InsightsPage />} />
                       <Route path="/insights/:slug" element={<ArticlePage />} />
                       <Route path="/faq" element={<FaqPage />} />
                       <Route path="/contact" element={<ContactPage />} />
@@ -96,6 +105,9 @@ export default function App() {
                     <Route path="/book" element={<BookPage />} />
                     <Route path="/legal-intake" element={<IntakePage />} />
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/admin-login" element={<AdminLoginPage />} />
+                    <Route path="/register" element={<Navigate to="/login" replace />} />
+                    <Route path="/client-register" element={<Navigate to="/login" replace />} />
 
                     {/* لوحة الإدارة */}
                     <Route path="/admin" element={<AdminLayout />}>
@@ -110,9 +122,16 @@ export default function App() {
                       <Route path="matters/:id" element={<MatterDetailPage />} />
                       <Route path="tasks" element={<TasksPage />} />
                       <Route path="documents" element={<DocumentsPage />} />
+                      <Route path="finance" element={<FinancePage />} />
+                      <Route path="finance/reports" element={<FinanceReportsPage />} />
+                      <Route path="finance/debts" element={<DebtsPage />} />
+                      <Route path="finance/invoices" element={<InvoicesPage />} />
+                      <Route path="finance/banking" element={<BankingPage />} />
                       <Route path="analytics" element={<AnalyticsPage />} />
                       <Route path="ai" element={<AiPage />} />
+                      <Route path="marketing" element={<MarketingPage />} />
                       <Route path="settings" element={<SettingsPage />} />
+                      <Route path="settings/office" element={<OfficeSettingsPage />} />
                     </Route>
 
                     {/* بوابة العميل */}
@@ -123,10 +142,14 @@ export default function App() {
                       <Route path="documents" element={<PortalDocumentsPage />} />
                       <Route path="appointments" element={<PortalAppointmentsPage />} />
                       <Route path="messages" element={<PortalMessagesPage />} />
+                      <Route path="invoices" element={<PortalInvoicesPage />} />
                       <Route path="profile" element={<PortalProfilePage />} />
                     </Route>
 
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    {/* 404 داخل التخطيط العام — لا يُعاد توجيهها للرئيسية حتى لا تُعدّ soft 404 */}
+                    <Route element={<PublicLayout />}>
+                      <Route path="*" element={<NotFoundPage />} />
+                    </Route>
                   </Routes>
                 </Suspense>
               </BrowserRouter>

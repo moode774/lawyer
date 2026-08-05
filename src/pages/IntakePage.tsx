@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { useT } from '../lib/i18n'
 import { track } from '../lib/analytics'
-import { store } from '../lib/store'
+import { createLead } from '../lib/store'
 import { DEMO_SERVICES } from '../data/demo'
 import { Card } from '../components/ui/card'
 import { Button } from '../components/ui/button'
@@ -48,6 +48,7 @@ export default function IntakePage() {
   const [preferredDate, setPreferredDate] = useState('')
   const [fileName, setFileName] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleNext = () => {
     setErrorMsg('')
@@ -70,26 +71,27 @@ export default function IntakePage() {
 
   const handlePrev = () => setStep((prev) => Math.max(prev - 1, 1))
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmitting) return
+    setIsSubmitting(true)
+    setErrorMsg('')
     track('intake_completed', { category, clientType, preferredType })
 
-    // Create lead in store
-    const newLead = store.addLead({
-      name,
-      phone,
-      email,
-      company: clientType === 'company' ? companyName : undefined,
-      type: clientType,
-      category,
-      source: 'الموقع الإلكتروني - النموذج الذكي',
-      status: 'new',
-      notes: `تفاصيل الطلب: ${details} | طريقة الاستشارة المفضلة: ${preferredType} | التاريخ المفضّل: ${preferredDate || 'غير محدد'} | مستوى الأهمية: ${urgency}`,
-      consultationType: preferredType,
-      preferredDate: preferredDate || undefined
-    })
-
-    setSubmittedRef(newLead.ref)
+    try {
+      const newLead = await createLead({
+        name: name.trim(), phone: phone.trim(), email: email.trim(),
+        company: clientType === 'company' ? companyName.trim() : undefined,
+        type: clientType, category, source: 'direct',
+        summary: `تفاصيل الطلب: ${details} | طريقة الاستشارة المفضلة: ${preferredType} | التاريخ المفضّل: ${preferredDate || 'غير محدد'} | مستوى الأهمية: ${urgency}`,
+        consultationType: preferredType, preferredDate: preferredDate || undefined,
+      })
+      setSubmittedRef(newLead.ref)
+    } catch (error) {
+      setErrorMsg(error instanceof Error ? error.message : 'تعذر حفظ الطلب، يرجى المحاولة مرة أخرى')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (submittedRef) {
@@ -409,7 +411,7 @@ export default function IntakePage() {
                 </div>
                 <p className="text-[#C4D8E5] leading-relaxed">
                   {t(
-                    'جميع البيانات والمعلومات المدخلة مشمولة بالسرية المهنية المطلقة لمكتب المحاماة وفقًا للأنظمة السعودية الصادرة عن وزارة العدل وهيئة المحامين.',
+                    'تُعامل البيانات والمعلومات المدخلة وفق التزامات السرية المهنية والأنظمة ذات الصلة، وفي حدود الأغراض اللازمة لدراسة الطلب.',
                     'All provided information remains strictly confidential under Saudi Bar Association rules.'
                   )}
                 </p>

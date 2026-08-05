@@ -25,12 +25,21 @@ export const useT = () => {
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
+    // ‏?lang=en يمنح النسخة الإنجليزية رابطًا مستقلًا قابلًا للفهرسة (hreflang)
+    const fromUrl = new URLSearchParams(window.location.search).get('lang')
+    if (fromUrl === 'en' || fromUrl === 'ar') return fromUrl
     return (localStorage.getItem('lf_locale') as Locale) || 'ar'
   })
 
   const setLocale = (l: Locale) => {
     setLocaleState(l)
     localStorage.setItem('lf_locale', l)
+
+    // مزامنة الرابط حتى تبقى النسخة قابلة للمشاركة والفهرسة
+    const url = new URL(window.location.href)
+    if (l === 'en') url.searchParams.set('lang', 'en')
+    else url.searchParams.delete('lang')
+    window.history.replaceState({}, '', url)
   }
 
   useEffect(() => {

@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Calendar, Clock, Video, Building, Phone, CheckCircle2, XCircle, Search } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { listAppointments } from '../../lib/store'
 import { Appointment } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -15,7 +16,7 @@ export default function BookingsPage() {
   const { t } = useT()
   useSEO({ title: 'جدول المواعيد والاستشارات | ' + t('مكتب المحاماة', 'Law Firm') })
 
-  const [appointments, setAppointments] = useState<Appointment[]>(store.getAppointments())
+  const { data: appointments = [] } = useQuery<Appointment[]>({ queryKey: ['appointments'], queryFn: () => listAppointments() })
   const [search, setSearch] = useState('')
 
   const filtered = appointments.filter((a) => a.name.toLowerCase().includes(search.toLowerCase()) || a.ref.toLowerCase().includes(search.toLowerCase()))

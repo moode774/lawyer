@@ -33,6 +33,9 @@ export default function LeadDetailPage() {
   const [lead, setLead] = useState<Lead | undefined>(store.getLead(id || ''))
   const [newNote, setNewNote] = useState('')
 
+  // يُستدعى دائمًا قبل أي خروج مبكر — الخطافات لا تُستدعى شرطيًا.
+  useSEO({ title: lead ? `ملف الطلب ${lead.ref} | ${lead.name}` : 'ملف غير موجود', noindex: true })
+
   if (!lead) {
     return (
       <div className="p-12 text-center text-ink-muted">
@@ -41,8 +44,6 @@ export default function LeadDetailPage() {
       </div>
     )
   }
-
-  useSEO({ title: `ملف الطلب ${lead.ref} | ${lead.name}` })
 
   const handleConvert = () => {
     const newClient = store.convertLeadToClient(lead.id)

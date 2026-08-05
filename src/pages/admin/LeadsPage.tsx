@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { Search, ExternalLink } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { listLeads } from '../../lib/store'
 import { Lead } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -17,7 +18,7 @@ export default function LeadsPage() {
   const { t } = useT()
   useSEO({ title: 'قائمة العملاء المحتملين | ' + t('مكتب المحاماة', 'Law Firm') })
 
-  const leads: Lead[] = store.getLeads()
+  const { data: leads = [] } = useQuery<Lead[]>({ queryKey: ['leads'], queryFn: listLeads })
   const [search, setSearch] = useState('')
 
   const filtered = leads.filter((l) =>

@@ -19,8 +19,22 @@
   * {
     @apply border-[#C4D8E5]/60;
   }
+  /* حالة تركيز واضحة بألوان الهوية — أساس التنقّل بلوحة المفاتيح */
   :focus-visible {
-    @apply outline-none ring-2 ring-[#8EB1D1] ring-offset-2 ring-offset-background;
+    @apply outline-none ring-2 ring-[#C5A880] ring-offset-2 ring-offset-white;
+  }
+  /* احترام تفضيل تقليل الحركة في نظام المستخدم */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
   input[type='number']::-webkit-outer-spin-button,
   input[type='number']::-webkit-inner-spin-button {
@@ -113,4 +127,13 @@
     background-color: #C4D8E5;
     border-radius: 9999px;
   }
+  
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
+

@@ -1,26 +1,45 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { CalendarCheck, Menu, Phone, X, Shield, Sparkles } from 'lucide-react'
-import { brand } from '../config/brand'
+import { Calendar, Menu, Phone, Mail, MapPin, Clock, MessageCircle, X } from 'lucide-react'
 import { track, trackPageView } from '../lib/analytics'
 import { useLang } from '../lib/i18n'
-import { buttonVariants, Button } from '../components/ui/button'
-import { Logo } from '../components/shared/Logo'
-import { PatternLattice } from '../components/shared/PatternLattice'
 import { cn } from '../lib/utils'
+import { BRAND } from '../config/brand'
 
 const navLinks = [
   { to: '/', ar: 'الرئيسية', en: 'Home' },
+  { to: '/about', ar: 'عن المكتب', en: 'About Us' },
   { to: '/services', ar: 'خدماتنا', en: 'Services' },
-  { to: '/about', ar: 'عن المكتب', en: 'About Firm' },
+  { to: '/insights', ar: 'مقالات قانونية', en: 'Insights' },
   { to: '/faq', ar: 'الأسئلة الشائعة', en: 'FAQ' },
   { to: '/contact', ar: 'تواصل معنا', en: 'Contact' },
 ]
+
+const footerServices = [
+  { slug: 'corporate-law', ar: 'الأنظمة التجارية وتأسيس الشركات', en: 'Corporate & Commercial' },
+  { slug: 'commercial-disputes', ar: 'النزاعات التجارية والتقاضي', en: 'Commercial Disputes' },
+  { slug: 'employment-law', ar: 'نظام العمل والقضايا العمالية', en: 'Employment & Labor' },
+  { slug: 'real-estate', ar: 'العقارات والمقاولات والبيوع', en: 'Real Estate' },
+  { slug: 'execution', ar: 'التنفيذ وتحصيل الديون', en: 'Enforcement & Debt' },
+]
+
+function HeaderLogo() {
+  return (
+    <Link to="/" className="flex items-center shrink-0 overflow-hidden" aria-label="Bin Nouh - Home">
+      <img
+        src="/icon11.webp"
+        alt="شعار مكتب بن نوح للمحاماة والاستشارات القانونية"
+        className="h-9 sm:h-10 lg:h-12 max-w-[190px] w-auto object-contain transition-transform hover:scale-105"
+      />
+    </Link>
+  )
+}
 
 export default function PublicLayout() {
   const [open, setOpen] = useState(false)
   const { pathname } = useLocation()
   const { t, locale, setLocale } = useLang()
+  const isHome = pathname === '/'
 
   useEffect(() => {
     setOpen(false)
@@ -28,23 +47,35 @@ export default function PublicLayout() {
   }, [pathname])
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f6f8fa] text-[#1C2B48]">
-      {/* Sticky Header with Cool Cerulean & Midnight Blue styling */}
-      <header className="sticky top-0 z-40 border-b border-[#C4D8E5]/60 bg-white/90 backdrop-blur-md shadow-xs transition-all">
-        <div className="container flex h-20 items-center justify-between gap-4">
-          <Logo />
+    <div className="flex min-h-screen flex-col bg-[#FDFCFB] text-[#0B1221] font-tajawal" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+
+      {/* تخطّي إلى المحتوى — يظهر عند التنقّل بلوحة المفاتيح */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:start-4 focus:z-[60] focus:rounded-lg focus:bg-[#0B132B] focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-white"
+      >
+        {t('تخطّي إلى المحتوى', 'Skip to content')}
+      </a>
+
+      {/* SINGLE UNIFIED LUXURY HEADER */}
+      <header className="sticky top-0 z-50 bg-white border-b border-[#F0EBE1] shadow-sm">
+        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 flex h-[80px] items-center justify-between">
           
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="التنقل الرئيسي">
+          {/* Right Side (RTL Start) -> Logo */}
+          <HeaderLogo />
+
+          {/* Center -> Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-8" aria-label={t('التنقل الرئيسي', 'Main navigation')}>
             {navLinks.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
                 className={({ isActive }) =>
                   cn(
-                    'rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200',
+                    'relative py-7 text-[15px] font-bold transition-colors',
                     isActive
-                      ? 'bg-[#1C2B48] text-white shadow-sm'
-                      : 'text-[#2a3e5c] hover:bg-[#E8ECEF] hover:text-[#1C2B48]',
+                      ? 'text-[#C7A87D] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-[#C7A87D]'
+                      : 'text-[#334155] hover:text-[#0B1221]',
                   )
                 }
               >
@@ -53,125 +84,218 @@ export default function PublicLayout() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')}
-              className="hidden rounded-xl bg-[#E8ECEF] px-3 py-2 font-latin text-xs font-bold text-[#1C2B48] hover:bg-[#C4D8E5] transition-colors sm:block"
-              aria-label="Switch language"
-            >
-              {locale === 'ar' ? 'English' : 'عربي'}
-            </button>
-
-            <a
-              href={`tel:${brand.phone}`}
-              onClick={() => track('phone_click')}
-              className="hidden items-center gap-2 text-xs font-bold text-[#1C2B48] hover:text-[#8EB1D1] transition-colors md:flex bg-[#E8ECEF]/80 px-3 py-2 rounded-xl border border-[#C4D8E5]/50"
-            >
-              <Phone className="size-3.5 text-[#8EB1D1]" />
-              <span className="font-latin" dir="ltr">{brand.phoneDisplay}</span>
+          {/* Left Side (RTL End) -> Phone, Language & CTA Button */}
+          <div className="hidden md:flex items-center gap-5">
+            <a href={`tel:${BRAND.phone}`} onClick={() => track('phone_click')} className="flex items-center gap-2 text-xs font-bold text-[#334155] hover:text-[#C7A87D] transition-colors">
+              <Phone className="size-3.5 text-[#C7A87D]" />
+              <span dir="ltr" className="font-mono tracking-wide">{BRAND.phoneDisplay}</span>
             </a>
+
+            <span className="text-gray-300">|</span>
+
+            <button onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')} className="text-xs font-bold text-[#334155] hover:text-[#C7A87D] transition-colors" aria-label="Switch language">
+              {locale === 'ar' ? 'EN' : 'العربية'}
+            </button>
 
             <Link
               to="/book"
-              onClick={() => track('cta_click', { cta: 'book_nav' })}
-              className={cn(buttonVariants({ variant: 'accent', size: 'md' }), 'hidden sm:inline-flex shadow-sm')}
+              onClick={() => track('cta_click', { cta: 'header_book' })}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#C7A87D] hover:bg-[#b8986c] text-[#060B19] px-5 py-2.5 font-bold transition-all text-xs shadow-sm hover:shadow"
             >
-              <CalendarCheck className="size-4" />
-              {t('احجز استشارة', 'Book Consultation')}
+              <Calendar className="size-4" />
+              <span>{t('احجز استشارة', 'Book Consultation')}</span>
             </Link>
-
-            <button className="rounded-xl p-2 text-[#1C2B48] hover:bg-[#E8ECEF] lg:hidden" onClick={() => setOpen(!open)} aria-label="القائمة">
-              {open ? <X className="size-6" /> : <Menu className="size-6" />}
-            </button>
           </div>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="rounded p-2 text-[#0B1221] lg:hidden bg-slate-50"
+            onClick={() => setOpen(!open)}
+            aria-label={t('فتح القائمة', 'Open menu')}
+            aria-expanded={open}
+          >
+            {open ? <X className="size-6" /> : <Menu className="size-6" />}
+          </button>
         </div>
 
+        {/* Mobile Dropdown */}
         {open && (
-          <nav className="border-t border-[#C4D8E5] bg-white px-6 py-5 lg:hidden animate-fade-in shadow-xl" aria-label="قائمة الجوال">
-            <div className="flex flex-col gap-2">
+          <nav className="border-t border-[#F0EBE1] bg-white px-6 py-4 lg:hidden shadow-lg absolute w-full space-y-3">
+            <div className="flex flex-col gap-1">
               {navLinks.map((l) => (
-                <NavLink key={l.to} to={l.to} className="rounded-xl px-4 py-3 text-base font-semibold text-[#1C2B48] hover:bg-[#E8ECEF]">
+                <NavLink
+                  key={l.to}
+                  to={l.to}
+                  className={({ isActive }) =>
+                    cn(
+                      'px-4 py-3 text-base font-bold transition-all rounded-md',
+                      isActive ? 'bg-[#FDFBF7] text-[#C7A87D]' : 'text-[#334155]'
+                    )
+                  }
+                >
                   {t(l.ar, l.en)}
                 </NavLink>
               ))}
-              <Link to="/book" onClick={() => track('cta_click', { cta: 'book_mobile_nav' })} className={cn(buttonVariants({ variant: 'accent', size: 'lg' }), 'mt-4 w-full')}>
-                <CalendarCheck className="size-5" />
-                {t('احجز استشارة قانونية', 'Book a consultation')}
+            </div>
+
+            <div className="pt-3 border-t border-[#F0EBE1] flex flex-col gap-3">
+              <Link
+                to="/book"
+                onClick={() => track('cta_click', { cta: 'mobile_menu_book' })}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#C7A87D] text-[#060B19] py-3 font-bold text-sm"
+              >
+                <Calendar className="size-4" />
+                <span>{t('احجز استشارة', 'Book Consultation')}</span>
               </Link>
             </div>
           </nav>
         )}
       </header>
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1 flex flex-col">
         <Outlet />
       </main>
 
-      {/* Sticky Mobile CTA */}
-      <div className="sticky bottom-0 z-30 border-t border-[#C4D8E5] bg-white/95 p-3 backdrop-blur sm:hidden shadow-lg">
-        <Link to="/book" className={cn(buttonVariants({ variant: 'accent', size: 'lg' }), 'w-full shadow-md')}>
-          <CalendarCheck className="size-5" />
-          {t('احجز استشارة الآن', 'Book Consultation Now')}
-        </Link>
-      </div>
+      {/* FOOTER */}
+      <footer className="bg-[#060B19] text-white">
+        <div className="w-full max-w-[1240px] mx-auto px-6 lg:px-8 pt-16 pb-8">
 
-      {/* Luxury Midnight Blue Footer with Cool Cerulean Details */}
-      <footer className="border-t border-[#1C2B48] bg-[#1C2B48] text-white relative overflow-hidden">
-        <PatternLattice opacity={0.08} color="#8EB1D1" />
-        <div className="container relative z-10 grid gap-12 py-16 md:grid-cols-4">
-          <div className="md:col-span-2 space-y-4">
-            <Logo dark />
-            <p className="max-w-md text-sm leading-relaxed text-[#C4D8E5]">
-              {t(
-                'منظومة استشارات وخدمات قانونية رفيعة المستوى للأفراد والمنشآت في المملكة العربية السعودية، وفق أفضل المعايير المهنية وحماية السرية.',
-                'Premier legal advisory and advocacy services in the Kingdom of Saudi Arabia, engineered for distinction, agility, and absolute confidentiality.',
-              )}
-            </p>
-            <div className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-3.5 py-1.5 text-xs text-[#A7C7E7] border border-[#8EB1D1]/30">
-              <Shield className="size-3.5 text-[#8EB1D1]" />
-              <span>{t('رقم ترخيص المحاماة', 'License No.')}: <span className="font-latin font-bold">{brand.licenseNumber}</span></span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+
+            {/* Identity */}
+            <div className="lg:col-span-1">
+              <img
+                src="/icon11.webp"
+                alt={t('شعار مكتب المحامي ابن نوح للمحاماة', 'Bin Nouh Law Firm logo')}
+                className="h-10 w-auto object-contain mb-5"
+                width={420}
+                height={260}
+                loading="lazy"
+              />
+              <p className="text-[12.5px] text-slate-400 font-medium leading-[1.9]">
+                {t(BRAND.nameAr, BRAND.nameEn)}
+              </p>
+              <p className="text-[11px] text-slate-400 font-medium leading-relaxed mt-4">
+                {t(
+                  `مرخّص من وزارة العدل برقم (${BRAND.licenseNumber})`,
+                  `Licensed by the Ministry of Justice No. (${BRAND.licenseNumber})`
+                )}
+                <br />
+                {t(
+                  `سجل الهيئة السعودية للمحامين (${BRAND.legalEntityId})`,
+                  `Saudi Bar Association No. (${BRAND.legalEntityId})`
+                )}
+              </p>
             </div>
-          </div>
 
-          <div>
-            <h4 className="mb-4 text-base font-bold text-white flex items-center gap-2">
-              <span className="size-2 rounded-full bg-[#8EB1D1]" />
-              {t('روابط سريعة', 'Quick Links')}
-            </h4>
-            <ul className="space-y-3 text-sm text-[#C4D8E5]">
-              {navLinks.map((l) => (
-                <li key={l.to}>
-                  <Link to={l.to} className="hover:text-white hover:translate-x-1 transition-all inline-block">{t(l.ar, l.en)}</Link>
+            {/* Practice areas */}
+            <div>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#C7A87D] mb-5">
+                {t('التخصصات', 'Practice Areas')}
+              </h3>
+              <ul className="space-y-3">
+                {footerServices.map((s) => (
+                  <li key={s.slug}>
+                    <Link to={`/services/${s.slug}`} className="text-[12.5px] text-slate-400 hover:text-white transition-colors font-medium">
+                      {t(s.ar, s.en)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Site links */}
+            <div>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#C7A87D] mb-5">
+                {t('روابط', 'Navigate')}
+              </h3>
+              <ul className="space-y-3">
+                {[...navLinks, { to: '/book', ar: 'حجز استشارة', en: 'Book' }].map((l) => (
+                  <li key={l.to}>
+                    <Link to={l.to} className="text-[12.5px] text-slate-400 hover:text-white transition-colors font-medium">
+                      {t(l.ar, l.en)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#C7A87D] mb-5">
+                {t('التواصل', 'Contact')}
+              </h3>
+              <ul className="space-y-4 text-[12.5px] text-slate-400 font-medium">
+                <li>
+                  <a href={`tel:${BRAND.phone}`} onClick={() => track('phone_click')} className="hover:text-white transition-colors flex items-center gap-2.5">
+                    <Phone className="size-3.5 text-[#C7A87D] shrink-0" strokeWidth={1.5} />
+                    <span dir="ltr">{BRAND.phoneDisplay}</span>
+                  </a>
                 </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-4 text-base font-bold text-white flex items-center gap-2">
-              <span className="size-2 rounded-full bg-[#A7C7E7]" />
-              {t('معلومات التواصل', 'Contact Info')}
-            </h4>
-            <ul className="space-y-3 text-sm text-[#C4D8E5]">
-              <li dir="ltr" className="font-latin text-end md:text-start text-white font-bold">{brand.phoneDisplay}</li>
-              <li className="font-latin text-[#A7C7E7]">{brand.email}</li>
-              <li>{t(brand.officeAddress, brand.officeAddressEn)}</li>
-              <li className="text-xs text-[#8EB1D1]">{t(brand.workingHours, 'Sun–Thu: 9 AM – 6 PM')}</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-[#8EB1D1]/20 bg-[#131e33] py-6">
-          <div className="container flex flex-wrap items-center justify-between gap-4 text-xs text-[#C4D8E5]/80">
-            <p>© {new Date().getFullYear()} {t(brand.firmNameAr, brand.firmNameEn)}. {t('جميع الحقوق محفوظة.', 'All rights reserved.')}</p>
-            <div className="flex gap-6 font-medium">
-              <Link to="/privacy" className="hover:text-white transition-colors">{t('سياسة الخصوصية', 'Privacy Policy')}</Link>
-              <Link to="/terms" className="hover:text-white transition-colors">{t('الشروط والأحكام', 'Terms of Service')}</Link>
-              <Link to="/login" className="text-[#8EB1D1] hover:text-white transition-colors font-bold">{t('دخول الموظفين والعملاء', 'Portal Sign in')}</Link>
+                <li>
+                  <a href={`mailto:${BRAND.email}`} className="hover:text-white transition-colors flex items-center gap-2.5">
+                    <Mail className="size-3.5 text-[#C7A87D] shrink-0" strokeWidth={1.5} />
+                    <span dir="ltr" className="break-all">{BRAND.email}</span>
+                  </a>
+                </li>
+                <li className="flex items-start gap-2.5 leading-relaxed">
+                  <MapPin className="size-3.5 text-[#C7A87D] shrink-0 mt-1" strokeWidth={1.5} />
+                  <span>{t(BRAND.officeAddress, BRAND.officeAddressEn)}</span>
+                </li>
+                <li className="flex items-start gap-2.5 leading-relaxed">
+                  <Clock className="size-3.5 text-[#C7A87D] shrink-0 mt-1" strokeWidth={1.5} />
+                  <span>{BRAND.workingHours}</span>
+                </li>
+              </ul>
             </div>
           </div>
+
+          {/* Bottom bar */}
+          <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-[11.5px] text-slate-400 font-medium text-center sm:text-start">
+              © {new Date().getFullYear()} {t(BRAND.nameAr, BRAND.nameEn)}. {t('جميع الحقوق محفوظة.', 'All rights reserved.')}
+            </p>
+            <div className="flex items-center gap-6">
+              <Link to="/privacy" className="text-[11.5px] text-slate-400 hover:text-white transition-colors font-medium">
+                {t('سياسة الخصوصية', 'Privacy Policy')}
+              </Link>
+              <Link to="/terms" className="text-[11.5px] text-slate-400 hover:text-white transition-colors font-medium">
+                {t('الشروط والأحكام', 'Terms')}
+              </Link>
+            </div>
+          </div>
+
+          <p className="mt-6 text-[10.5px] text-slate-400 leading-relaxed text-center sm:text-start">
+            {t(
+              'ما يُنشر في هذا الموقع ذو طابع تعريفي عام ولا يُعدّ استشارة قانونية لحالة بعينها، ولا تنشأ علاقة موكّل بمحامٍ إلا بعد قبول العمل كتابةً وتحديد نطاقه.',
+              'Content on this website is general information and does not constitute legal advice for any specific matter. No attorney-client relationship arises until engagement is accepted in writing.'
+            )}
+          </p>
         </div>
       </footer>
+
+      {/* اتصال سريع — واتساب وهاتف */}
+      <div className="fixed bottom-5 end-5 z-40 flex flex-col gap-3 print:hidden">
+        <a
+          href={`https://wa.me/${BRAND.whatsappNumber.replace(/[^0-9]/g, '')}`}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => track('whatsapp_click')}
+          aria-label={t('تواصل عبر واتساب', 'Contact via WhatsApp')}
+          className="size-12 rounded-full bg-[#0B132B] hover:bg-[#16203f] text-[#D6B57E] border border-[#C5A880]/40 shadow-lg flex items-center justify-center transition-colors"
+        >
+          <MessageCircle className="size-5" strokeWidth={1.5} />
+        </a>
+        <a
+          href={`tel:${BRAND.phone}`}
+          onClick={() => track('phone_click')}
+          aria-label={t('اتصال مباشر', 'Call the office')}
+          className="size-12 rounded-full bg-white hover:bg-[#FAF5EB] text-[#0B132B] border border-[#E6DBC9] shadow-lg flex items-center justify-center transition-colors sm:hidden"
+        >
+          <Phone className="size-5" strokeWidth={1.5} />
+        </a>
+      </div>
     </div>
   )
 }
+

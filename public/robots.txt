@@ -1,0 +1,14 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# المناطق الخاصة — بيانات عملاء ومستندات قضايا
+Disallow: /admin
+Disallow: /admin/
+Disallow: /portal
+Disallow: /portal/
+Disallow: /login
+Disallow: /admin-login
+Disallow: /legal-intake
+
+Sitemap: https://www.binnouh.com/sitemap.xml

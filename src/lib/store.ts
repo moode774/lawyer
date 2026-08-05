@@ -142,9 +142,53 @@ export async function markAllNotificationsRead(): Promise<void> {
 
 // ===== Leads =====
 export async function listLeads(): Promise<Lead[]> {
-  await wait()
+  const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false })
+  if (!error && data) return data.map(mapLeadRow)
   return [...db.leads].sort((a: Lead, b: Lead) => b.createdAt.localeCompare(a.createdAt))
 }
+
+const makeRef = (prefix: 'LD' | 'BK' | 'MSG') =>
+  `${prefix}-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`
+
+const mapLeadRow = (row: any): Lead => ({
+  id: row.id,
+  ref: row.reference_number,
+  type: row.client_type,
+  name: row.full_name,
+  phone: row.phone,
+  email: row.email || undefined,
+  company: row.company_name || undefined,
+  category: row.category,
+  summary: row.notes || undefined,
+  notes: row.notes || undefined,
+  consultationType: row.consultation_type || undefined,
+  source: row.source,
+  status: row.status,
+  estimatedValue: Number(row.estimated_value || 0),
+  createdAt: row.created_at,
+  lastActivityAt: row.last_activity_at || row.created_at,
+})
+
+const mapAppointmentRow = (row: any): Appointment => ({
+  id: row.id,
+  ref: row.reference_number,
+  leadId: row.lead_id || undefined,
+  clientId: row.client_id || undefined,
+  name: row.name,
+  phone: row.phone || '',
+  email: row.email || undefined,
+  type: row.meeting_type,
+  category: row.category || undefined,
+  date: row.appointment_date,
+  time: row.appointment_time,
+  preferredDate: row.appointment_date,
+  preferredTime: row.appointment_time,
+  duration: row.duration,
+  status: row.status,
+  location: row.location_details || undefined,
+  notes: row.notes || undefined,
+  createdAt: row.created_at,
+})
 
 export async function getLead(id: string): Promise<Lead | undefined> {
   await wait()
@@ -162,27 +206,22 @@ export interface NewLeadInput {
   source: Lead['source']
   landingPage?: string
   utm?: Lead['utm']
+  consultationType?: Lead['consultationType']
+  preferredDate?: string
 }
 
 export async function createLead(input: NewLeadInput): Promise<Lead> {
-  await wait(100)
+  const now = new Date().toISOString()
   const lead: Lead = {
-    id: uid(),
-    ref: `LD-2026-0${leadSeq++}`,
+    id: crypto.randomUUID(),
+    ref: makeRef('LD'),
     status: 'new',
-    createdAt: new Date().toISOString(),
-    lastActivityAt: new Date().toISOString(),
+    createdAt: now,
+    lastActivityAt: now,
     ...input,
   }
-  db.leads.unshift(lead)
-  saveDb()
-
-  logActivity({ entityType: 'lead', entityId: lead.id, type: 'lead_created', text: 'تم إنشاء العميل المحتمل عبر نموذج الطلب القانوني', actor: 'النظام' })
-  notify({ title: 'طلب استشارة جديد', body: `${lead.name} — ${lead.category}`, link: `/admin/leads/${lead.id}`, kind: 'lead' })
-  queueWhatsApp(lead.phone, `مرحبًا ${lead.name}، تم استلام طلب الاستشارة القانونية برقم ${lead.ref}.`, 'lead', lead.id)
-
-  try {
-    supabase.from('leads').insert([{
+  const { error } = await supabase.from('leads').insert([{
+      id: lead.id,
       reference_number: lead.ref,
       full_name: lead.name,
       phone: lead.phone,
@@ -192,19 +231,83 @@ export async function createLead(input: NewLeadInput): Promise<Lead> {
       category: lead.category,
       source: lead.source,
       status: 'new',
-      notes: lead.summary || null
-    }]).then(({ error }) => {
-      if (error) console.warn('Supabase lead sync info:', error.message)
-    })
-  } catch (err) {}
+      notes: lead.summary || null,
+      consultation_type: lead.consultationType || null,
+      preferred_date: input.preferredDate || null,
+    }])
+  if (error) throw new Error(`تعذر حفظ الطلب في قاعدة البيانات: ${error.message}`)
+
+  db.leads.unshift(lead)
+  saveDb()
+  logActivity({ entityType: 'lead', entityId: lead.id, type: 'lead_created', text: 'تم إنشاء العميل المحتمل عبر نموذج الطلب القانوني', actor: 'النظام' })
+  notify({ title: 'طلب استشارة جديد', body: `${lead.name} — ${lead.category}`, link: `/admin/leads/${lead.id}`, kind: 'lead' })
+
+  void notifyOffice({
+    kind: lead.consultationType || input.preferredDate ? 'booking' : 'intake',
+    reference: lead.ref,
+    name: lead.name,
+    phone: lead.phone,
+    email: lead.email,
+    message: lead.summary,
+    service: lead.category,
+    preferredAt: input.preferredDate,
+  })
 
   return lead
 }
 
+/**
+ * إشعار المكتب فورًا بالطلب الوارد (بريد/واتساب) عبر Edge Function `notify-lead`.
+ * الاستدعاء صامت عمدًا: فشل الإشعار لا يجوز أن يمنع حفظ طلب العميل أو يُظهر له خطأ.
+ */
+async function notifyOffice(payload: {
+  kind: 'contact' | 'booking' | 'intake'
+  reference: string
+  name: string
+  phone: string
+  email?: string | null
+  message?: string | null
+  service?: string | null
+  preferredAt?: string | null
+}): Promise<void> {
+  try {
+    await supabase.functions.invoke('notify-lead', { body: payload })
+  } catch {
+    // متجاهَل عمدًا — الطلب محفوظ في قاعدة البيانات ويظهر في لوحة الإدارة على كل حال.
+  }
+}
+
+export async function createContactRequest(input: { name: string; phone: string; email?: string; message: string }): Promise<string> {
+  const reference = makeRef('MSG')
+  const { error } = await supabase.from('contact_requests').insert({
+    id: crypto.randomUUID(),
+    reference_number: reference,
+    full_name: input.name.trim(),
+    phone: input.phone.trim(),
+    email: input.email?.trim() || null,
+    message: input.message.trim(),
+    status: 'new',
+    source: 'website_contact',
+  })
+  if (error) throw new Error(`تعذر إرسال الرسالة: ${error.message}`)
+
+  void notifyOffice({
+    kind: 'contact',
+    reference,
+    name: input.name.trim(),
+    phone: input.phone.trim(),
+    email: input.email?.trim() || null,
+    message: input.message.trim(),
+  })
+
+  return reference
+}
+
 export async function updateLeadStage(id: string, newStage: PipelineStage): Promise<Lead | undefined> {
-  await wait(100)
+  const { error } = await supabase.from('leads').update({ status: newStage, last_activity_at: new Date().toISOString() }).eq('id', id)
+  if (error) throw new Error(`تعذر تحديث الحالة: ${error.message}`)
   const lead = db.leads.find((l: Lead) => l.id === id)
-  if (!lead) return undefined
+  if (!lead) return (await listLeads()).find((item) => item.id === id)
   const old = lead.status
   lead.status = newStage
   lead.lastActivityAt = new Date().toISOString()
@@ -246,46 +349,45 @@ export interface NewAppointmentInput {
 }
 
 export async function createAppointment(input: NewAppointmentInput): Promise<Appointment> {
-  await wait(100)
+  const now = new Date().toISOString()
   const appt: Appointment = {
-    id: uid(),
-    ref: `BK-2026-0${bookingSeq++}`,
-    status: 'confirmed',
-    createdAt: new Date().toISOString(),
+    id: crypto.randomUUID(),
+    ref: makeRef('BK'),
+    status: 'pending',
+    createdAt: now,
     ...input,
   }
-  db.appointments.unshift(appt)
-  saveDb()
-
-  logActivity({ entityType: 'appointment', entityId: appt.id, type: 'status_changed', text: `تم حجز موعد استشارة (${appt.type}) في ${appt.preferredDate} الساعة ${appt.preferredTime}`, actor: 'العميل' })
-  notify({ title: 'موعد استشارة مؤكد', body: `${appt.name} — ${appt.preferredDate} ${appt.preferredTime}`, link: `/admin/bookings`, kind: 'booking' })
-
-  if (appt.phone) {
-    queueWhatsApp(appt.phone, `تم تأكيد موعد استشارتك بنجاح بتاريخ ${appt.preferredDate} الساعة ${appt.preferredTime}.`, 'lead', appt.leadId)
-  }
-
-  try {
-    supabase.from('appointments').insert([{
+  const { error } = await supabase.from('appointments').insert([{
+      id: appt.id,
       reference_number: appt.ref,
+      lead_id: appt.leadId || null,
       name: appt.name,
       phone: appt.phone,
-      email: appt.email || '',
-      appointment_type: appt.type,
-      category: appt.category || '',
-      scheduled_date: appt.preferredDate || '',
-      scheduled_time: appt.preferredTime || '',
-      status: 'confirmed',
-      notes: appt.notes || null
-    }]).then(({ error }) => {
-      if (error) console.warn('Supabase appointment sync info:', error.message)
-    })
-  } catch (err) {}
+      email: appt.email || null,
+      meeting_type: appt.type,
+      category: appt.category || null,
+      appointment_date: appt.preferredDate || appt.date,
+      appointment_time: appt.preferredTime || appt.time,
+      status: 'pending',
+      notes: appt.notes || null,
+      location_details: appt.type === 'office' ? 'مقر المكتب - الرياض' : appt.type === 'video' ? 'اجتماع مرئي' : 'اتصال هاتفي',
+    }])
+  if (error) throw new Error(`تعذر حفظ الموعد في قاعدة البيانات: ${error.message}`)
+
+  db.appointments.unshift(appt)
+  saveDb()
+  logActivity({ entityType: 'appointment', entityId: appt.id, type: 'status_changed', text: `تم طلب موعد استشارة (${appt.type}) في ${appt.preferredDate} الساعة ${appt.preferredTime}`, actor: 'العميل' })
+  notify({ title: 'موعد استشارة جديد', body: `${appt.name} — ${appt.preferredDate} ${appt.preferredTime}`, link: `/admin/bookings`, kind: 'booking' })
 
   return appt
 }
 
 export async function listAppointments(clientId?: string, leadId?: string): Promise<Appointment[]> {
-  await wait()
+  let query = supabase.from('appointments').select('*').order('created_at', { ascending: false })
+  if (clientId) query = query.eq('client_id', clientId)
+  if (leadId) query = query.eq('lead_id', leadId)
+  const { data, error } = await query
+  if (!error && data) return data.map(mapAppointmentRow)
   let list = db.appointments
   if (clientId || leadId) {
     list = list.filter((a: Appointment) => a.clientId === clientId || a.leadId === leadId)

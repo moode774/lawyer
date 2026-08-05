@@ -1,50 +1,15 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
-import { Calendar, Clock, Video, Building, Plus } from 'lucide-react'
-import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
-import type { Appointment } from '../../types'
+import { useQuery } from '@tanstack/react-query'
+import { Calendar, Plus } from 'lucide-react'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
 import { StatusBadge } from '../../components/ui/status-badge'
 import { PageHeader } from '../../components/ui/page-header'
-import { useSEO } from '../../lib/seo'
+import { listMyAppointments } from '../../lib/portal'
 
 export default function PortalAppointmentsPage() {
-  const { t } = useT()
-  useSEO({ title: 'مواعيدي واستشاراتي | بوابة العميل' })
-
-  const appts = store.getAppointments()
-
-  return (
-    <div className="space-y-6 pb-12">
-      <PageHeader
-        title={t('جدول استشاراتك والمواعيد', 'Your Appointments')}
-        description={t('الاطلاع على مواعيد الجلسات وحجز موعد جديد', 'View calendar & request new session')}
-        action={
-          <Link to="/book">
-            <Button className="bg-navy text-white hover:bg-navy-light gap-2">
-              <Plus className="size-4" />
-              <span>{t('طلب موعد جديد', 'Book New')}</span>
-            </Button>
-          </Link>
-        }
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {appts.map((a: Appointment) => (
-          <Card key={a.id} className="p-5 bg-white border-border space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-ink text-sm">{a.name}</span>
-              <StatusBadge status={a.status} />
-            </div>
-            <div className="text-xs text-ink-muted space-y-1 font-mono">
-              <div>التاريخ: {a.date} ({a.time})</div>
-              <div>المكان: {a.location}</div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  )
+  const { data: appts = [], isLoading, error } = useQuery({ queryKey: ['portal','appointments'], queryFn: listMyAppointments })
+  return <div className="space-y-6 pb-12"><PageHeader title="مواعيدك واستشاراتك" description="المواعيد المرتبطة بملف العميل" action={<Link to="/book"><Button className="gap-2 bg-navy text-white"><Plus className="size-4"/>طلب موعد</Button></Link>} />
+    {isLoading ? <p className="text-sm text-ink-muted">جاري التحميل...</p> : error ? <p className="text-sm text-danger">{(error as Error).message}</p> : <div className="grid gap-4 md:grid-cols-2">{appts.map(a => <Card key={a.id} className="space-y-3 bg-white p-5"><div className="flex justify-between"><span className="font-bold">{a.name}</span><StatusBadge status={a.status}/></div><div className="text-xs text-ink-muted">{a.date} — {a.time}<br/>{a.location}</div></Card>)}{appts.length === 0 && <div className="md:col-span-2 rounded-3xl border border-dashed bg-white p-12 text-center"><Calendar className="mx-auto mb-3 size-8 text-[#9CB1C0]"/>لا توجد مواعيد مرتبطة بالحساب</div>}</div>}
+  </div>
 }

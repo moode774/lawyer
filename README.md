@@ -38,6 +38,17 @@ npm install
 npm run dev
 ```
 
+### توليد الصور عبر OpenAI
+
+مفتاح OpenAI لا يوضع في متغيرات `VITE_*` لأنها تُضمّن في المتصفح. خزّنه وانشر الدالة الآمنة بهذه الأوامر:
+
+```bash
+supabase secrets set OPENAI_API_KEY=sk-proj-your-key
+supabase functions deploy generate-marketing-image
+```
+
+تستخدم الدالة `gpt-image-2` وتدعم الصور المربعة والطولية والعرضية بجودة متوسطة أو عالية.
+
 افتح المتصفح على: `http://localhost:5173`
 
 ---

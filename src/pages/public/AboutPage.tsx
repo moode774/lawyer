@@ -1,262 +1,282 @@
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import {
   ShieldCheck,
   Award,
   Scale,
-  CalendarCheck,
-  ArrowLeft,
   Briefcase,
-  Sparkles
+  ArrowLeft
 } from 'lucide-react'
 import { useT } from '../../lib/i18n'
 import { BRAND } from '../../config/brand'
-import { Card } from '../../components/ui/card'
-import { Badge } from '../../components/ui/badge'
-import { buttonVariants } from '../../components/ui/button'
 import { cn } from '../../lib/utils'
-import { useSEO } from '../../lib/seo'
+import { useSEO, breadcrumbLd, SITE_URL } from '../../lib/seo'
 
-// MAGAZINE ARTICLES WITH INTERACTIVE MODAL CONTENT
-const MAGAZINE_ARTICLES = [
+const PRINCIPLES = [
   {
-    id: 1,
-    titleAr: '5 نصائح جوهرية قبل قيد أي دعوى تجارية أمام المحاكم',
-    titleEn: '5 Critical Tips Before Filing Commercial Litigation',
-    category: 'التقاضي والنزاعات',
-    publishedAt: '2026-01-15',
-    author: BRAND.lawyerNameAr,
-    readMinutes: 6,
-    excerptAr: 'اختيار الكيان والتجهيز المستندي المحكم أول خطوات الفوز بالدعوى التجارية والتنفيذ السريع.',
-    contentAr: [
-      'تأكد من توثيق كافة المراسلات السابقة والعقود بالسجلات الرسمية والمستندات الكتابية.',
-      'راجع المهل النظامية والتقادم المنصوص عليه في نظام المحاكم التجارية.',
-      'قم بتحديد طلباتك المالية الدقيقة بجدول حسابي معتمد.',
-      'تأكد من توفير الوكالات الشرعية أو النظامية السارية قبل البدء بقيد الصحيفة.',
-      'استشر محاميًا متخصصًا لتقييم فرص الفوز وقابلية تنفيذ الحكم لاحقًا.'
-    ]
+    titleAr: 'رؤيتنا',
+    titleEn: 'Our Vision',
+    bodyAr: 'تقديم تجربة قانونية منظمة تجمع الدراسة المهنية للملف بوضوح التواصل والاستفادة المسؤولة من الحلول الرقمية.',
+    bodyEn: 'An organized legal experience combining professional assessment, clear communication, and responsible digital tools.'
   },
   {
-    id: 2,
-    titleAr: 'أفكار حوكمة وقائية لوقاية الشركات العائلية من النزاعات',
-    titleEn: 'Preventative Governance for Family Businesses',
-    category: 'الشركات والحوكمة',
-    publishedAt: '2026-01-10',
-    author: 'سارة العتيبي',
-    readMinutes: 5,
-    excerptAr: 'تأطير الملكيات والإدارة عبر ميثاق عائلي يضمن استمرار الأجيال واستقرار الكيان التجارية.',
-    contentAr: [
-      'صياغة اتفاقية شركاء (Family Constitution) واضحة تحدد ملكيات وحصص كل طرف.',
-      'فصل الإدارة التنفيذية عن الملكية العائلية لضمان الاستمرارية والاحترافية.',
-      'تحديد آلية التقييم والتخارج عند رغبة أحد الشركاء في البيع.',
-      'إنشاء مجلس استشاري محايد للفصل في التباينات التشغيلية.',
-      'اعتماد لائحة توزيع الأرباح والاحتياطيات النظامية بشكل شفاف.'
-    ]
+    titleAr: 'قيمنا المهنية',
+    titleEn: 'Core Values',
+    bodyAr: 'الوضوح، والمحافظة على السرية المهنية، ومراعاة المهل النظامية، والعناية في إعداد العقود والمذكرات.',
+    bodyEn: 'Clarity, professional confidentiality, attention to statutory deadlines, and careful drafting.'
   },
   {
-    id: 3,
-    titleAr: 'كيف تراجع عقدك التجاري لمنع الثغرات التخريبية؟',
-    titleEn: 'How to Review Commercial Contracts Against Legal Risks',
-    category: 'العقود والصياغة',
-    publishedAt: '2025-12-28',
-    author: BRAND.lawyerNameAr,
-    readMinutes: 5,
-    excerptAr: 'معظم النزاعات التعاقدية كان يمكن تجنبها بمراجعة دقيقة قبل التوقيع مع المحامي.',
-    contentAr: [
-      'التحقق من صلة الأطراف وصلاحيات التوقيع المقيدة بالسجل التجاري.',
-      'مراجعة بند الشرط الجزائي والتأكد من عدم مغالاته أو مخالفته للنظام.',
-      'تحديد آلية الفسخ والإخطارات الكتابية المسبقة.',
-      'تأكيد بند الاختصاص القضائي للمحاكم التجارية بالسعودية.',
-      'التحقق من حماية السرية وشرط عدم المنافسة التعاقدي.'
-    ]
-  },
-  {
-    id: 4,
-    titleAr: 'أحدث التعديلات في نظام العمل واللوائح التنفيذية 2026',
-    titleEn: 'Latest Saudi Labor Law Amendments 2026',
-    category: 'نظام العمل',
-    publishedAt: '2025-12-15',
-    author: 'خالد الشمري',
-    readMinutes: 7,
-    excerptAr: 'شرح عملي للتعديلات الحديثة على المادتين 77 و 80 وضوابط فترات التجربة والإنهاء.',
-    contentAr: [
-      'التعديلات الجديدة على فترات التجربة وضوابط التمديد.',
-      'تحديثات ساعات العمل والإجازات السنوية والمكافآت.',
-      'الضوابط النظامية لإنهاء العقود وفق المادة 77 و المادة 80.',
-      'التزام المنشآت بتطبيق منصة قوى واللوائح التنفيذية المعتمدة.',
-      'حقوق الموظف عند نقل الخدمات أو اندماج المنشآت.'
-    ]
+    titleAr: 'الامتثال والترخيص',
+    titleEn: 'Licensing & Compliance',
+    bodyAr: 'نلتزم بالأنظمة السعودية ذات الصلة وقواعد السلوك المهني، مع التحقق من تعارض المصالح قبل قبول العمل.',
+    bodyEn: 'Aligned with applicable Saudi regulations and professional conduct rules, subject to conflict checks.'
   }
+]
+
+const COMMITMENTS = [
+  { icon: ShieldCheck, ar: 'سرية مهنية', en: 'Confidentiality' },
+  { icon: Scale, ar: 'دراسة مستقلة لكل ملف', en: 'Individual Assessment' },
+  { icon: Briefcase, ar: 'نطاق عمل واضح', en: 'Defined Scope' },
+  { icon: Award, ar: 'التزام مهني', en: 'Professional Commitment' }
 ]
 
 export default function AboutPage() {
   const { t, isRTL } = useT()
-  useSEO({ title: `عن المكتب والمحامي والمعرفة | ${BRAND.nameAr}` })
+  useSEO({
+    title: `عن المكتب والمحامي | ${BRAND.nameAr}`,
+    description: 'التعريف بمكتب المحامي ابن نوح للمحاماة والاستشارات القانونية، رؤيته ومبادئه المهنية وبيانات الترخيص الرسمية.',
+    path: '/about',
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'AboutPage',
+        name: 'عن المكتب',
+        mainEntity: { '@id': `${SITE_URL}/#legalservice` },
+      },
+      breadcrumbLd([
+        { name: 'الرئيسية', path: '/' },
+        { name: 'عن المكتب', path: '/about' },
+      ]),
+    ],
+  })
 
-  const [selectedArticle, setSelectedArticle] = useState<typeof MAGAZINE_ARTICLES[0] | null>(null)
-  const [activeTab, setActiveTab] = useState<'firm' | 'lawyer' | 'insights'>('firm')
+  const registry = [
+    { labelAr: 'ترخيص وزارة العدل', labelEn: 'MOJ License', value: BRAND.licenseNumber },
+    { labelAr: 'سجل الهيئة السعودية للمحامين', labelEn: 'Bar Association', value: BRAND.legalEntityId },
+    { labelAr: 'رمز النشاط', labelEn: 'Activity Code', value: BRAND.activityCode },
+    { labelAr: 'المقر الرئيسي', labelEn: 'Head Office', value: t(`${BRAND.city} — ${BRAND.district}`, `${BRAND.districtEn}, ${BRAND.cityEn}`) }
+  ]
 
   return (
-    <div className={cn('w-full bg-[#f6f8fa] text-[#1C2B48] pb-20 space-y-16 font-tajawal', isRTL ? 'text-right' : 'text-left')}>
-      
-      {/* HERO SECTION */}
-      <section className="relative pt-16 pb-20 bg-[#E8ECEF] border-b border-[#C4D8E5]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <Badge className="font-reem bg-[#8EB1D1] text-[#1C2B48] font-bold text-xs px-4 py-1.5 inline-flex items-center gap-2 shadow-sm border-none">
-            <ShieldCheck className="size-4 text-[#1C2B48]" />
-            <span>{t('مكتب محاماة مرخص رسميًا من وزارة العدل', 'Licensed Saudi Law Firm')}</span>
-            <span>•</span>
-            <span className="font-mono">{BRAND.licenseNumber}</span>
-          </Badge>
+    <div className={cn('w-full bg-[#FAF9F5] text-[#0F172A] pb-24 font-tajawal antialiased', isRTL ? 'text-right' : 'text-left')}>
 
-          <h1 className="font-amiri text-4xl sm:text-5xl lg:text-6xl font-bold text-[#1C2B48] leading-tight max-w-4xl mx-auto">
-            {t(`عن ${BRAND.nameAr} وسيرتنا القانونية`, `About ${BRAND.nameEn} & Legal Expertise`)}
+      {/* HERO */}
+      <section className="relative pt-20 pb-24 bg-[#0B132B] text-white border-b border-[#C5A880]/30 overflow-hidden">
+        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #C5A880 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C5A880]/20 border border-[#C5A880]/40 text-[#C5A880] text-xs font-bold">
+            <ShieldCheck className="size-4 text-[#C5A880]" />
+            <span>{t('ممارسة قانونية ملتزمة بالأنظمة وقواعد السلوك المهني', 'Committed to professional conduct')}</span>
+          </div>
+
+          <h1 className="font-amiri text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
+            {t('عن المكتب', 'About the Firm')}
           </h1>
 
-          <p className="font-tajawal text-[#527094] text-base sm:text-xl max-w-3xl mx-auto leading-relaxed font-medium">
+          <div className="flex items-center justify-center gap-4 py-1">
+            <div className="h-[1px] w-16 bg-[#C5A880]/60" />
+            <Scale className="size-5 text-[#C5A880]" strokeWidth={1.5} />
+            <div className="h-[1px] w-16 bg-[#C5A880]/60" />
+          </div>
+
+          <p className="font-tajawal text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
             {t(
-              'صرح قانوني رائد يجمع بين التقاليد الراسخة للمحاماة بالشرق الأوسط والحلول الرقمية الحديثة لحماية مصالح المنشآت والأفراد بأعلى المعايير.',
-              'A premier Saudi legal practice combining deep jurisprudence with modern digital infrastructure for corporate & private clients.'
+              'ممارسة قانونية سعودية تجمع العناية المهنية بالتنظيم الرقمي، وتقدم خدماتها للأفراد والمنشآت وفق نطاق عمل واضح وسرية مهنية.',
+              'A Saudi legal practice combining professional care with organized digital service for individuals and businesses.'
             )}
           </p>
+        </div>
+      </section>
 
-          {/* Quick Tab Switch */}
-          <div className="pt-6 flex justify-center font-tajawal">
-            <div className="inline-flex p-1.5 rounded-full bg-white border border-[#C4D8E5] shadow-sm text-xs font-bold gap-1">
-              <button
-                onClick={() => setActiveTab('firm')}
-                className={cn('px-6 py-2.5 rounded-full transition-all cursor-pointer', activeTab === 'firm' ? 'bg-[#1C2B48] text-white shadow' : 'text-[#527094] hover:text-[#1C2B48]')}
-              >
-                {t('عن المكتب ورؤيتنا', 'About the Firm')}
-              </button>
-              <button
-                onClick={() => setActiveTab('lawyer')}
-                className={cn('px-6 py-2.5 rounded-full transition-all cursor-pointer', activeTab === 'lawyer' ? 'bg-[#1C2B48] text-white shadow' : 'text-[#527094] hover:text-[#1C2B48]')}
-              >
-                {t('المحامي الرئيسي', 'The Lawyer')}
-              </button>
-              <button
-                onClick={() => setActiveTab('insights')}
-                className={cn('px-6 py-2.5 rounded-full transition-all cursor-pointer', activeTab === 'insights' ? 'bg-[#1C2B48] text-white shadow' : 'text-[#527094] hover:text-[#1C2B48]')}
-              >
-                {t('المدونة والمعرفة النظامية', 'Legal Insights')}
-              </button>
+      {/* OPENING STATEMENT + OFFICIAL REGISTRY */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+
+          <div className="lg:col-span-7">
+            <span className="text-[10px] font-bold text-[#C5A880] tracking-[0.22em] uppercase block mb-5">
+              {t('من نحن', 'Who We Are')}
+            </span>
+
+            <p className="font-amiri text-2xl sm:text-[28px] font-bold text-[#0F172A] leading-[1.75] mb-6">
+              {t(
+                'مكتب متخصص في المحاماة والاستشارات القانونية بالرياض، يعمل وفق منهجية واضحة تبدأ بدراسة الوقائع والمستندات وتنتهي برأي نظامي مكتوب وخطة عمل محددة.',
+                'A specialized law and legal consultancy office in Riyadh, working through a clear methodology that begins with reviewing facts and documents and ends with a written legal opinion and a defined action plan.'
+              )}
+            </p>
+
+            <div className="space-y-4 text-[14px] text-[#64748B] font-medium leading-[2]">
+              <p>
+                {t(
+                  'نخدم الأفراد والمنشآت في نطاقات الشركات والعقود والنزاعات التجارية والقضايا العمالية والعقارية والتنفيذ، مع تحديد نطاق العمل والأتعاب كتابةً قبل بدء أي إجراء.',
+                  'We serve individuals and businesses across corporate, contracts, commercial disputes, labor, real estate, and enforcement matters — with scope and fees agreed in writing before any action begins.'
+                )}
+              </p>
+              <p>
+                {t(
+                  'ولأن الملفات القانونية تحتمل التأخير أقل من غيرها، اعتمدنا نظاماً رقمياً لمتابعة القضايا والمواعيد والمستندات، يتيح للعميل الاطلاع على مستجدات ملفه دون انتظار.',
+                  'Because legal matters tolerate delay least of all, we operate a digital system for tracking cases, appointments, and documents, giving clients direct visibility into their file.'
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* Official registry — hairline definition list */}
+          <div className="lg:col-span-5 w-full">
+            <div className="border-t border-[#E6DBC9]">
+              <div className="py-4 border-b border-[#F1E8DA]">
+                <span className="text-[10px] font-bold text-[#C5A880] tracking-[0.22em] uppercase">
+                  {t('البيانات النظامية', 'Official Registry')}
+                </span>
+              </div>
+
+              {registry.map((row) => (
+                <div key={row.labelAr} className="flex items-baseline justify-between gap-6 py-4 border-b border-[#F1E8DA]">
+                  <span className="text-[12.5px] text-slate-500 font-medium shrink-0">
+                    {t(row.labelAr, row.labelEn)}
+                  </span>
+                  <span className="text-[14px] font-bold text-[#0F172A] text-end">
+                    {row.value}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
+      {/* PRINCIPLES — NUMBERED COLUMNS */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+        <div className="flex items-center gap-4 mb-10">
+          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#C5A880] shrink-0">
+            {t('المبادئ المهنية', 'Professional Principles')}
+          </span>
+          <span className="h-px flex-1 bg-[#E6DBC9]" />
+        </div>
 
-        {/* SECTION 1: ABOUT THE FIRM */}
-        <section id="firm-section" className="space-y-12">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="font-reem text-xs font-bold text-[#8EB1D1] uppercase tracking-widest block">
-              {t('القسم الأول', 'Part I')}
-            </span>
-            <h2 className="font-amiri text-3xl sm:text-4xl font-bold text-[#1C2B48]">{t('رؤيتنا ورسالتنا في العمل القانوني', 'Our Vision & Core Values')}</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="p-8 bg-white border border-[#C4D8E5] shadow-sm hover:shadow-xl transition-all space-y-4 text-center group rounded-3xl">
-              <div className="size-14 rounded-2xl bg-[#E8ECEF] text-[#1C2B48] flex items-center justify-center mx-auto group-hover:bg-[#1C2B48] group-hover:text-white transition-colors duration-300">
-                <ShieldCheck className="size-7" />
-              </div>
-              <h3 className="font-amiri text-2xl font-bold text-[#1C2B48]">{t('رؤيتنا', 'Our Vision')}</h3>
-              <p className="font-tajawal text-sm text-[#527094] leading-relaxed">
-                {t('أن نكون المنظومة القانونية الأولى في المملكة العربية السعودية التي تمزج الممارسة الميدانية الاحترافية بالتنظيم الرقمي المبتكر.', 'To be the premier digital-first law firm providing trusted Saudi legal services.')}
+        <div className="grid grid-cols-1 md:grid-cols-3">
+          {PRINCIPLES.map((p, i) => (
+            <div
+              key={p.titleEn}
+              className={cn(
+                'border-[#EFE6D8] py-7 md:px-8 md:py-2',
+                'border-b last:border-b-0 md:border-b-0',
+                i > 0 && 'md:border-s'
+              )}
+            >
+              <span className="font-amiri text-2xl text-[#C5A880]/45 block mb-3 tabular-nums">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 className="font-amiri text-xl font-bold text-[#0F172A] mb-3 leading-snug">
+                {t(p.titleAr, p.titleEn)}
+              </h3>
+              <p className="text-[13px] text-[#64748B] font-medium leading-[1.95]">
+                {t(p.bodyAr, p.bodyEn)}
               </p>
-            </Card>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            <Card className="p-8 bg-white border border-[#C4D8E5] shadow-sm hover:shadow-xl transition-all space-y-4 text-center group rounded-3xl">
-              <div className="size-14 rounded-2xl bg-[#E8ECEF] text-[#8EB1D1] flex items-center justify-center mx-auto group-hover:bg-[#8EB1D1] group-hover:text-[#1C2B48] transition-colors duration-300">
-                <Scale className="size-7" />
-              </div>
-              <h3 className="font-amiri text-2xl font-bold text-[#1C2B48]">{t('قيمنا المهنية', 'Core Values')}</h3>
-              <p className="font-tajawal text-sm text-[#527094] leading-relaxed">
-                {t('الشفافية المطلقة، الحفاظ على السرية المهنية، الالتزام الصارم بالمهل، والدقة المتناهية في صياغة العقود والمذكرات.', 'Absolute transparency, confidentiality, strict deadlines, and precise contract drafting.')}
+      {/* PRINCIPAL LAWYER */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+        <div className="flex items-center gap-4 mb-10">
+          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#C5A880] shrink-0">
+            {t('المؤسس والمستشار', 'Founder & Principal')}
+          </span>
+          <span className="h-px flex-1 bg-[#E6DBC9]" />
+        </div>
+
+        <div className="bg-white border border-[#EADFCF] rounded-2xl overflow-hidden">
+          <div className="flex flex-col sm:flex-row">
+
+            {/* Monogram */}
+            <div className="sm:w-52 bg-[#0B132B] flex flex-col items-center justify-center py-10 sm:py-12 shrink-0">
+              <span className="font-amiri text-5xl font-bold text-[#D6B57E] leading-none">BN</span>
+              <span className="h-px w-10 bg-[#C5A880]/50 my-4" />
+              <span className="text-[9px] font-bold uppercase tracking-[0.28em] text-slate-400">
+                Advocate
+              </span>
+            </div>
+
+            {/* Details */}
+            <div className="flex-1 p-8 sm:p-10">
+              <h3 className="font-amiri text-[26px] font-bold text-[#0F172A] leading-snug">
+                {BRAND.lawyerNameAr}
+              </h3>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#C5A880] mt-2">
+                {t('محامٍ ومستشار قانوني', 'Lawyer & Legal Consultant')}
               </p>
-            </Card>
 
-            <Card className="p-8 bg-white border border-[#C4D8E5] shadow-sm hover:shadow-xl transition-all space-y-4 text-center group rounded-3xl">
-              <div className="size-14 rounded-2xl bg-[#E8ECEF] text-[#1C2B48] flex items-center justify-center mx-auto group-hover:bg-[#1C2B48] group-hover:text-white transition-colors duration-300">
-                <Award className="size-7" />
-              </div>
-              <h3 className="font-amiri text-2xl font-bold text-[#1C2B48]">{t('الامتثال والترخيص', 'Licensing & Compliance')}</h3>
-              <p className="font-tajawal text-sm text-[#527094] leading-relaxed">
-                {t(`مرخص رسميًا من وزارة العدل وهيئة المحامين برقم ترخيص: ${BRAND.licenseNumber}، مع التزام تام بالأنظمة واللوائح السعودية.`, `Officially licensed by Saudi Ministry of Justice & SBA (License ${BRAND.licenseNumber}).`)}
-              </p>
-            </Card>
-          </div>
-
-          {/* Stats Bar */}
-          <div className="p-8 sm:p-10 rounded-3xl bg-[#1C2B48] text-white grid grid-cols-2 md:grid-cols-4 gap-8 text-center shadow-xl border border-[#8EB1D1]/30">
-            <div className="space-y-1">
-              <p className="font-amiri text-3xl sm:text-4xl font-bold text-white font-mono">+12</p>
-              <p className="font-reem text-xs text-[#C4D8E5] font-bold">{t('سنوات خبرة في القضاء والترافع', 'Years Experience')}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="font-amiri text-3xl sm:text-4xl font-bold text-[#8EB1D1] font-mono">+500</p>
-              <p className="font-reem text-xs text-[#C4D8E5] font-bold">{t('استشارة منجزة بنجاح', 'Consultations Delivered')}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="font-amiri text-3xl sm:text-4xl font-bold text-white font-mono">SAR 60M+</p>
-              <p className="font-reem text-xs text-[#C4D8E5] font-bold">{t('قيمة العقود والتحصيلات', 'Value Drafted & Collected')}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="font-amiri text-3xl sm:text-4xl font-bold text-[#A7C7E7] font-mono">100%</p>
-              <p className="font-reem text-xs text-[#C4D8E5] font-bold">{t('سرية وأمان البيانات', 'Confidentiality')}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 2: THE LAWYER PROFILE */}
-        <section id="lawyer-section" className="space-y-12">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="font-reem text-xs font-bold text-[#8EB1D1] uppercase tracking-widest block">
-              {t('القسم الثاني', 'Part II')}
-            </span>
-            <h2 className="font-amiri text-3xl sm:text-4xl font-bold text-[#1C2B48]">{t('المحامي والمستشار القانوني الرئيسي', 'Principal Lawyer & Attorney Profile')}</h2>
-          </div>
-
-          <Card className="p-8 sm:p-12 bg-white border border-[#C4D8E5] shadow-lg rounded-3xl flex flex-col lg:flex-row items-center gap-10">
-            <div className="size-36 sm:size-44 rounded-3xl bg-gradient-to-br from-[#1C2B48] to-[#283d63] text-[#8EB1D1] flex items-center justify-center text-5xl font-bold font-amiri shrink-0 shadow-2xl border-2 border-[#8EB1D1]/40 relative overflow-hidden">
-              <span>{BRAND.lawyerNameAr.charAt(0)}</span>
-              <div className="absolute bottom-2 inset-x-0 text-center">
-                <span className="text-[10px] uppercase font-mono tracking-widest text-[#C4D8E5] bg-[#1C2B48]/90 py-0.5 px-2.5 rounded-full border border-[#8EB1D1]/30 font-bold">
-                  Advocate
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-6 text-center lg:text-start flex-1 font-tajawal">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
-                  <h3 className="font-amiri text-3xl font-bold text-[#1C2B48]">{BRAND.lawyerNameAr}</h3>
-                  <Badge className="font-reem bg-[#8EB1D1] text-[#1C2B48] font-bold text-xs">{BRAND.licenseNumber}</Badge>
-                </div>
-                <p className="text-sm font-bold text-[#8EB1D1]">{t('محامٍ ومستشار قانوني معتمد', 'Senior Advocate & Legal Consultant')}</p>
-              </div>
-
-              <p className="text-sm text-[#527094] leading-relaxed">
+              <p className="text-[13.5px] text-[#64748B] font-medium leading-[2] mt-5 pt-5 border-t border-[#F1E8DA]">
                 {t(
-                  'مستشار محاماة وترافع معتمد أمام كافة المحاكم السعودية. ممتد في خبرته عبر استشارات الشركات، العقود الاستثمارية، والنزاعات التجارية المعقدة مع سجل حافل بإنجاز ملفات كبرى بالأنظمة السعودية.',
-                  'Senior advocate and legal consultant practicing across Saudi courts with over a decade of specialized corporate & litigation mastery.'
+                  'يتولى الاستشارة والتمثيل القانوني في نطاقات الشركات والعقود والنزاعات التجارية، بعد دراسة الوقائع والمستندات وتحديد نطاق العمل والخيارات النظامية المتاحة أمام العميل.',
+                  'Handles advisory and representation in corporate, contracts, and commercial disputes — following review of the facts and documents, and definition of scope and available legal options.'
                 )}
               </p>
 
-              <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                <Link to="/book" className={cn(buttonVariants({ variant: 'accent', size: 'md' }), 'rounded-full font-bold px-6')}>
-                  <CalendarCheck className="size-4" />
-                  <span>{t('احجز جلسة مع المحامي', 'Book Direct Session')}</span>
+              <div className="mt-6 pt-5 border-t border-[#F1E8DA] flex flex-wrap items-center gap-x-8 gap-y-3">
+                <div>
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold block mb-1">
+                    {t('ترخيص وزارة العدل', 'MOJ License')}
+                  </span>
+                  <span className="text-[14px] font-bold text-[#0F172A]">{BRAND.licenseNumber}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold block mb-1">
+                    {t('سجل هيئة المحامين', 'Bar Association')}
+                  </span>
+                  <span className="text-[14px] font-bold text-[#0F172A]">{BRAND.legalEntityId}</span>
+                </div>
+
+                <Link
+                  to="/book"
+                  className="ms-auto inline-flex items-center gap-2 text-[12px] font-bold text-[#0F172A] hover:text-[#C5A880] transition-colors"
+                >
+                  <span>{t('احجز جلسة مع المحامي', 'Book a Session')}</span>
+                  <ArrowLeft className={cn('size-3.5 text-[#C5A880]', !isRTL && 'rotate-180')} />
                 </Link>
               </div>
             </div>
-          </Card>
-        </section>
+          </div>
+        </div>
+      </section>
 
-      </div>
+      {/* COMMITMENTS BAND */}
+      <section className="w-full bg-[#0B132B] border-y border-[#C5A880]/25 mt-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-12">
+          <div className="grid grid-cols-2 gap-y-10 md:grid-cols-4 md:gap-y-0">
+            {COMMITMENTS.map((c, i) => {
+              const Icon = c.icon
+              return (
+                <div
+                  key={c.en}
+                  className={cn(
+                    'relative px-5 text-center',
+                    i > 0 && 'md:before:absolute md:before:inset-y-1 md:before:start-0 md:before:w-px md:before:bg-white/10'
+                  )}
+                >
+                  <Icon className="size-5 text-[#C5A880] mx-auto mb-3" strokeWidth={1.25} />
+                  <p className="text-[12px] font-semibold text-slate-300 leading-relaxed">
+                    {t(c.ar, c.en)}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
     </div>
   )
 }

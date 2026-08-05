@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import { useT } from '../lib/i18n'
 import { track } from '../lib/analytics'
-import { store } from '../lib/store'
+import { createAppointment, createLead } from '../lib/store'
 import { DEMO_SERVICES } from '../data/demo'
 import { Card } from '../components/ui/card'
 import { Button } from '../components/ui/button'
@@ -51,8 +51,9 @@ export default function BookPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [bookingRef, setBookingRef] = useState('')
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     if (!name.trim() || !phone.trim() || !email.trim()) {
@@ -60,34 +61,28 @@ export default function BookPage() {
       return
     }
 
+    if (isSubmitting) return
+    setIsSubmitting(true)
     track('booking_completed', { selectedType, selectedService, selectedDate, selectedTime })
-
-    const appt = store.addAppointment({
-      name,
-      type: selectedType,
-      date: selectedDate,
-      time: selectedTime,
-      duration: '45 دقيقة',
-      status: 'confirmed',
-      location: selectedType === 'video' ? 'رابط زوم المباشر (سيصلك واتساب)' : selectedType === 'office' ? 'مقر المكتب - الرياض' : 'اتصال هاتفي مباشر'
-    })
-
-    // Also register lead
-    store.addLead({
-      name,
-      phone,
-      email,
-      type: 'individual',
-      category: selectedService,
-      source: 'حجز موعد مباشر',
-      status: 'consultation_booked',
-      consultationType: selectedType,
-      preferredDate: selectedDate,
-      notes: `حجز موعد استشارة: ${selectedService} | الوقت: ${selectedTime} | طريقة الانعقاد: ${selectedType}`
-    })
-
-    setBookingRef(appt.ref)
-    setIsSuccess(true)
+    try {
+      const lead = await createLead({
+        name: name.trim(), phone: phone.trim(), email: email.trim(), type: 'individual',
+        category: selectedService, source: 'direct', consultationType: selectedType,
+        preferredDate: selectedDate,
+        summary: notes || `حجز موعد استشارة: ${selectedService} | الوقت: ${selectedTime} | طريقة الانعقاد: ${selectedType}`,
+      })
+      const appt = await createAppointment({
+        leadId: lead.id, name: name.trim(), phone: phone.trim(), email: email.trim(),
+        type: selectedType, category: selectedService, preferredDate: selectedDate,
+        preferredTime: selectedTime, notes,
+      })
+      setBookingRef(appt.ref)
+      setIsSuccess(true)
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'تعذر حفظ الحجز، يرجى المحاولة مرة أخرى')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (isSuccess) {
@@ -100,23 +95,23 @@ export default function BookPage() {
 
           <div className="space-y-3">
             <Badge className="font-reem bg-[#8EB1D1] text-[#1C2B48] text-sm px-4 py-1.5 font-bold border-none shadow-sm">
-              {t('تم تأكيد حجز الموعد بنجاح', 'Consultation Booking Confirmed')}
+              {t('تم استلام طلب الموعد', 'Booking Request Received')}
             </Badge>
             <h1 className="font-amiri text-3xl font-bold text-[#1C2B48]">
               {t('رقم الحجز:', 'Booking Reference:')} <span className="font-mono text-[#8EB1D1]">{bookingRef}</span>
             </h1>
             <p className="text-[#527094] text-base max-w-lg mx-auto leading-relaxed">
               {t(
-                'تم تثبيت موعد استشارتك بنجاح. أرسلنا تفاصيل الانعقاد ورابط التذكير إلى رقم جوالك وبريدك الإلكتروني.',
-                'Your appointment is set. Confirmation details have been sent via WhatsApp and email.'
+                'سيراجع الفريق الموعد والبيانات المرسلة، ويصبح الحجز مؤكدًا بعد إشعارك عبر إحدى قنوات التواصل المسجلة.',
+                'The team will review your request. The appointment becomes confirmed only after you receive a confirmation notice.'
               )}
             </p>
           </div>
 
           <div className="p-6 rounded-2xl bg-[#E8ECEF]/70 border border-[#C4D8E5] text-start space-y-3 max-w-md mx-auto text-sm font-tajawal">
             <div className="flex justify-between">
-              <span className="text-[#527094]">{t('المحامي الخبير:', 'Lawyer:')}</span>
-              <span className="font-bold text-[#1C2B48]">أ. أحمد المحامي</span>
+              <span className="text-[#527094]">{t('المحامي المكلف:', 'Assigned Lawyer:')}</span>
+              <span className="font-bold text-[#1C2B48]">{t('يحدد بعد مراجعة الطلب', 'Assigned after review')}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[#527094]">{t('التاريخ والوقت:', 'Date & Time:')}</span>
@@ -148,13 +143,13 @@ export default function BookPage() {
       <div className="text-center space-y-4 mb-12">
         <Badge className="font-reem bg-[#8EB1D1] text-[#1C2B48] font-bold text-xs px-4 py-1.5 border-none shadow-sm">
           <CalendarIcon className="size-3.5 me-1.5 inline text-[#1C2B48]" />
-          {t('حجز مباشر ومؤكد', 'Direct Instant Booking')}
+          {t('طلب موعد استشارة', 'Consultation Booking Request')}
         </Badge>
         <h1 className="font-amiri text-4xl sm:text-5xl font-bold text-[#1C2B48] leading-tight">
           {t('احجز جلسة استشارة قانونية مباشرة', 'Book Your Legal Consultation')}
         </h1>
         <p className="text-[#527094] text-base max-w-xl mx-auto leading-relaxed">
-          {t('اختر الموعد وطريقة الانعقاد المناسبة لك لتأكيد الاستشارة مع المحامي مباشرة.', 'Select your preferred date, time slot, and meeting format.')}
+          {t('اختر الموعد وطريقة الانعقاد المناسبة، وسيؤكد الفريق التوفر ونطاق الاستشارة بعد مراجعة الطلب.', 'Select your preferred time and meeting format; availability and scope are confirmed after review.')}
         </p>
       </div>
 

@@ -1,103 +1,75 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useT } from '../lib/i18n'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { ArrowRight, KeyRound, Phone, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 import { BRAND } from '../config/brand'
-import { Card } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { useSEO } from '../lib/seo'
 
 export default function LoginPage() {
-  const { t } = useT()
-  const { login } = useAuth()
+  const { requestPhoneOtp, verifyPhoneOtp } = useAuth()
   const navigate = useNavigate()
-  useSEO({ title: 'تسجيل الدخول | ' + BRAND.nameAr })
+  useSEO({ title: `دخول بوابة العميل | ${BRAND.nameAr}` })
+  const [phone, setPhone] = useState('')
+  const [code, setCode] = useState('')
+  const [step, setStep] = useState<'phone' | 'code'>('phone')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const [role, setRole] = useState<'admin' | 'client'>('admin')
-  const [email, setEmail] = useState('lawyer@firm.com')
-  const [password, setPassword] = useState('password123')
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    login(email, role)
-    if (role === 'admin') {
-      navigate('/admin')
-    } else {
-      navigate('/portal')
-    }
+  async function submit(event: React.FormEvent) {
+    event.preventDefault(); setError(''); setLoading(true)
+    try {
+      if (step === 'phone') { await requestPhoneOtp(phone); setStep('code') }
+      else { await verifyPhoneOtp(phone, code); navigate('/portal', { replace: true }) }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'تعذر إكمال الطلب، حاول مرة أخرى') }
+    finally { setLoading(false) }
   }
 
   return (
-    <div className="max-w-md mx-auto py-20 px-4 font-tajawal min-h-[80vh] flex items-center">
-      <Card className="p-8 sm:p-10 bg-white border border-[#C4D8E5] shadow-2xl rounded-3xl space-y-6 w-full">
-        <div className="text-center space-y-2">
-          <div className="size-14 rounded-2xl bg-[#1C2B48] text-[#8EB1D1] flex items-center justify-center font-bold text-2xl font-amiri mx-auto shadow-md border border-[#8EB1D1]/30">
-            {BRAND.nameAr.charAt(0)}
+    <main dir="rtl" className="min-h-screen bg-[#f4f7fa] px-4 py-8 font-tajawal sm:py-14">
+      <div className="mx-auto max-w-md">
+        <Link to="/" className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-[#527094] hover:text-[#102541]">
+          <ArrowRight className="size-4" /> العودة إلى الموقع
+        </Link>
+        <section className="overflow-hidden rounded-[2rem] border border-[#cbd9e5] bg-white shadow-[0_24px_70px_rgba(16,37,65,.12)]">
+          <div className="h-1.5 bg-[#102541]" />
+          <div className="p-7 sm:p-10">
+            <div className="mb-8 text-center">
+              <div className="mx-auto mb-4 flex size-16 items-center justify-center overflow-hidden rounded-2xl border border-[#d7e1ea] bg-[#102541] shadow-lg">
+                <img src="/icons.webp" alt="شعار بن نوح" className="h-full w-full object-cover" />
+              </div>
+              <p className="mb-2 text-xs font-bold text-[#8a6b36]">بوابة العملاء</p>
+              <h1 className="font-amiri text-3xl font-bold text-[#102541]">دخول آمن وسريع</h1>
+              <p className="mt-2 text-sm leading-7 text-[#66778b]">أدخل رقم جوالك المسجل لمتابعة طلباتك ومواعيدك ومستنداتك.</p>
+            </div>
+
+            {error && <div role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}
+            <form onSubmit={submit} className="space-y-5">
+              {step === 'phone' ? (
+                <label className="block space-y-2">
+                  <span className="flex items-center gap-2 text-sm font-bold text-[#102541]"><Phone className="size-4 text-[#7599ba]" /> رقم الجوال</span>
+                  <Input autoFocus inputMode="tel" dir="ltr" autoComplete="tel" placeholder="05XXXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-14 rounded-xl border-[#bfd1df] text-center font-mono text-lg tracking-wider" required />
+                </label>
+              ) : (
+                <label className="block space-y-2">
+                  <span className="flex items-center gap-2 text-sm font-bold text-[#102541]"><KeyRound className="size-4 text-[#7599ba]" /> رمز التحقق</span>
+                  <Input autoFocus inputMode="numeric" dir="ltr" autoComplete="one-time-code" maxLength={6} placeholder="• • • • • •" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} className="h-14 rounded-xl border-[#bfd1df] text-center font-mono text-xl tracking-[.45em]" required />
+                  <p className="text-center text-xs text-[#66778b]">أرسلنا رمزًا مؤقتًا إلى {phone}</p>
+                </label>
+              )}
+              <Button type="submit" disabled={loading} className="h-14 w-full rounded-xl bg-[#102541] text-base font-bold text-white hover:bg-[#183758]">
+                {loading ? 'جاري التحقق...' : step === 'phone' ? 'إرسال رمز التحقق' : 'دخول بوابة العميل'}
+              </Button>
+              {step === 'code' && <button type="button" onClick={() => { setStep('phone'); setCode(''); setError('') }} className="w-full text-sm font-bold text-[#527094] hover:text-[#102541]">تغيير رقم الجوال</button>}
+            </form>
+            <div className="mt-7 flex items-start gap-3 rounded-2xl bg-[#f3f6f9] p-4 text-xs leading-6 text-[#66778b]">
+              <ShieldCheck className="mt-1 size-5 shrink-0 text-[#4d789c]" />
+              <p>لا تحتاج إلى بريد إلكتروني أو كلمة مرور. عند أول دخول يُنشأ لك حساب عميل تلقائيًا.</p>
+            </div>
           </div>
-          <h1 className="font-amiri text-3xl font-bold text-[#1C2B48]">{t('تسجيل الدخول للنظام', 'Platform Sign In')}</h1>
-          <p className="font-tajawal text-xs text-[#527094]">{t('منصة الإدارة وبوابة العملاء الآمنة', 'Secure Admin & Client Portal')}</p>
-        </div>
-
-        {/* Role Toggle Switch */}
-        <div className="grid grid-cols-2 gap-2 p-1.5 bg-[#E8ECEF]/80 rounded-2xl border border-[#C4D8E5] text-xs font-bold font-reem">
-          <button
-            type="button"
-            onClick={() => {
-              setRole('admin')
-              setEmail('lawyer@firm.com')
-            }}
-            className={`py-2.5 rounded-xl transition-all cursor-pointer ${role === 'admin' ? 'bg-[#1C2B48] text-white shadow-md' : 'text-[#527094]'}`}
-          >
-            {t('دخول المحامي / الفريق', 'Lawyer / Admin')}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setRole('client')
-              setEmail('client@company.com')
-            }}
-            className={`py-2.5 rounded-xl transition-all cursor-pointer ${role === 'client' ? 'bg-[#1C2B48] text-white shadow-md' : 'text-[#527094]'}`}
-          >
-            {t('بوابة العميل', 'Client Portal')}
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4 font-tajawal">
-          <div className="space-y-2">
-            <span className="text-xs font-bold text-[#1C2B48] block">{t('البريد الإلكتروني', 'Email')}</span>
-            <Input
-              type="email"
-              dir="ltr"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="border-[#C4D8E5] rounded-xl font-mono"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <span className="text-xs font-bold text-[#1C2B48] block">{t('كلمة المرور', 'Password')}</span>
-            <Input
-              type="password"
-              dir="ltr"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="border-[#C4D8E5] rounded-xl font-mono"
-            />
-          </div>
-
-          <Button type="submit" variant="accent" size="lg" className="w-full font-bold shadow-md rounded-2xl py-3.5 text-base">
-            {t('دخول النظام', 'Sign In')}
-          </Button>
-        </form>
-
-        <div className="p-3.5 rounded-2xl bg-[#E8ECEF]/60 border border-[#C4D8E5] text-[11px] text-[#527094] text-center space-y-1 font-tajawal">
-          <span className="font-bold text-[#1C2B48] block">{t('حساب تجريبي محمل مسبقًا:', 'Pre-loaded Demo Account:')}</span>
-          <p dir="ltr" className="font-mono text-[#1C2B48] font-bold">{email}</p>
-        </div>
-      </Card>
-    </div>
+        </section>
+      </div>
+    </main>
   )
 }

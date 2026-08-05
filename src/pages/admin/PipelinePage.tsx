@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import {
   Plus,
@@ -14,7 +15,7 @@ import {
   DollarSign
 } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { listLeads, updateLeadStage } from '../../lib/store'
 import { Lead } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -41,7 +42,12 @@ export default function PipelinePage() {
   const { t } = useT()
   useSEO({ title: 'خط أنبوب العملاء المحتملين CRM | ' + t('مكتب المحاماة', 'Law Firm') })
 
-  const [leads, setLeads] = useState<Lead[]>(store.getLeads())
+  const queryClient = useQueryClient()
+  const { data: leads = [] } = useQuery<Lead[]>({ queryKey: ['leads'], queryFn: listLeads })
+  const statusMutation = useMutation({
+    mutationFn: ({ leadId, status }: { leadId: string; status: Lead['status'] }) => updateLeadStage(leadId, status),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['leads'] }),
+  })
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
@@ -55,10 +61,7 @@ export default function PipelinePage() {
   })
 
   const handleStatusChange = (leadId: string, newStatus: Lead['status']) => {
-    const updated = store.updateLeadStatus(leadId, newStatus)
-    if (updated) {
-      setLeads([...store.getLeads()])
-    }
+    statusMutation.mutate({ leadId, status: newStatus })
   }
 
   return (

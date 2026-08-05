@@ -1,28 +1,34 @@
 /**
- * إعدادات الهوية الرسمية — بن نوح للمحاماة والاستشارات القانونية.
- * Official Brand Configuration for Bin Nouh Law Firm & Legal Consultancy.
+ * إعدادات الهوية الرسمية — مكتب المحامي أحمد بن عبد الحفيظ بن عبد الرحمن بن نوح للمحاماة والاستشارات القانونية.
+ * Official Brand Configuration for Ahmed Abdulhafith Nouh Law Firm.
+ * مرخص من وزارة العدل برقم ترخيص (4210) ومسجل بالهيئة السعودية للمحامين برقم (7050561203).
  */
 export const brand = {
-  firmNameAr: 'بن نوح للمحاماة والاستشارات القانونية',
-  firmNameEn: 'Bin Nouh Law Firm & Legal Consultancy',
-  nameAr: 'بن نوح للمحاماة والاستشارات القانونية',
-  nameEn: 'Bin Nouh Law Firm & Legal Consultancy',
-  shortNameAr: 'بن نوح',
-  shortNameEn: 'Bin Nouh',
-  lawyerNameAr: 'أ. بن نوح المحامي',
-  lawyerNameEn: 'Advocate Bin Nouh',
-  licenseNumber: '123456/44',
-  phone: '+966112345678',
-  phoneDisplay: '+966 11 234 5678',
-  whatsappNumber: '+966512345678',
-  email: 'info@binnouh.sa',
+  firmNameAr: 'مكتب المحامي أحمد بن عبد الحفيظ بن عبد الرحمن بن نوح للمحاماة والاستشارات القانونية',
+  firmNameEn: 'Ahmed Abdulhafith Nouh Law Firm & Legal Consultancy',
+  nameAr: 'مكتب المحامي أحمد بن نوح للمحاماة والاستشارات القانونية',
+  nameEn: 'Ahmed Bin Nouh Law Firm',
+  shortNameAr: 'بن نوح للمحاماة',
+  shortNameEn: 'Bin Nouh Law',
+  lawyerNameAr: 'أحمد بن عبد الحفيظ بن عبد الرحمن بن نوح',
+  lawyerNameEn: 'AHMED ABDULHAFITH ABDULRAHMAN NOUH',
+  licenseNumber: '4210',
+  nationalId: '1067002293',
+  legalEntityId: '7050561203',
+  activityCode: '691010',
+  phone: '+966500424282',
+  phoneDisplay: '+966 50 042 4282',
+  whatsappNumber: '+966500424282',
+  email: 'ednouh42@gmail.com',
   city: 'الرياض',
   cityEn: 'Riyadh',
-  officeAddress: 'الرياض — طريق الملك فهد، برج المكاتب، الدور 12',
-  officeAddressEn: 'King Fahd Rd, Office Tower, 12th Floor, Riyadh',
-  workingHours: 'الأحد – الخميس: 9 صباحًا – 6 مساءً',
-  taglineAr: 'وضوح قانوني. قرارات أكثر ثقة.',
-  taglineEn: 'Legal clarity. Confident decisions.',
+  district: 'حي المحمدية',
+  districtEn: 'Al-Muhammadiyah',
+  officeAddress: 'الرياض — حي المحمدية، طريق الملك فهد، مبنى رقم 8006، الرمز البريدي 12363',
+  officeAddressEn: 'Building 8006, King Fahd Rd, Al-Muhammadiyah, Riyadh 12363',
+  workingHours: 'الأحد – الخميس: 8:30 صباحًا – 5:30 مساءً',
+  taglineAr: 'وضوح قانوني. حماية شاملة. حلول دقيقة.',
+  taglineEn: 'Legal clarity. Complete protection. Precise solutions.',
 } as const
 
 export const BRAND = brand

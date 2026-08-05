@@ -9,6 +9,25 @@ export default {
     },
     extend: {
       colors: {
+        /**
+         * هوية المكتب الحالية — المصدر الوحيد لألوان الواجهة العامة.
+         * استخدمها بدل كتابة القيم يدويًا: bg-brand-navy, text-brand-gold, border-brand-line …
+         */
+        brand: {
+          navy: '#0B132B',
+          'navy-deep': '#060B19',
+          'navy-soft': '#16203F',
+          gold: '#C5A880',
+          'gold-light': '#D6B57E',
+          'gold-dark': '#9A7B3E',
+          cream: '#FAF9F5',
+          'cream-warm': '#FAF5EB',
+          line: '#EADFCF',
+          'line-soft': '#F1E8DA',
+          ink: '#0F172A',
+          muted: '#64748B',
+        },
+
         // High-end Palette requested:
         // Midnight Blue: #1C2B48
         // Cool Cerulean: #8EB1D1

@@ -164,12 +164,13 @@ export default function PublicLayout() {
 
             {/* Identity */}
             <div className="lg:col-span-1">
+              {/* النسخة الفاتحة من الشعار — مخصصة للخلفية الداكنة في الفوتر */}
               <img
-                src="/icon11.webp"
+                src="/logo-footer.webp"
                 alt={t('شعار مكتب المحامي ابن نوح للمحاماة', 'Bin Nouh Law Firm logo')}
-                className="h-10 w-auto object-contain mb-5"
-                width={420}
-                height={260}
+                className="h-14 w-auto object-contain mb-5"
+                width={520}
+                height={324}
                 loading="lazy"
               />
               <p className="text-[12.5px] text-slate-400 font-medium leading-[1.9]">

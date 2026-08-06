@@ -220,7 +220,7 @@ function NotificationBell() {
 }
 
 export default function AdminLayout() {
-  const { user, logout } = useAuth()
+  const { user, loading, logout } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -229,12 +229,22 @@ export default function AdminLayout() {
   useSEO({ title: 'لوحة إدارة المكتب', noindex: true })
 
   useEffect(() => {
+    // لا نطرد المستخدم قبل أن تنتهي استعادة الجلسة، وإلا خرج فور دخوله.
+    if (loading) return
     if (!user || user.role !== 'admin') navigate('/admin-login', { replace: true })
-  }, [user, navigate])
+  }, [user, loading, navigate])
 
   useEffect(() => setMobileOpen(false), [pathname])
 
-  if (!user) return null
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f4f7fa] font-tajawal text-sm text-[#66778b]">
+        جارٍ التحقق من الجلسة...
+      </div>
+    )
+  }
+
+  if (!user || user.role !== 'admin') return null
 
   const sidebar = (
     <div className="flex h-full flex-col font-tajawal bg-[#1C2B48]">

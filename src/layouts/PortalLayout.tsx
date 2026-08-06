@@ -29,7 +29,7 @@ const nav = [
 ]
 
 export default function PortalLayout() {
-  const { user, logout } = useAuth()
+  const { user, loading, logout } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
@@ -37,8 +37,18 @@ export default function PortalLayout() {
   useSEO({ title: 'بوابة العميل', noindex: true })
 
   useEffect(() => {
+    // انتظار انتهاء استعادة الجلسة قبل أي إعادة توجيه.
+    if (loading) return
     if (!user || user.role !== 'client') navigate('/login', { replace: true })
-  }, [user, navigate])
+  }, [user, loading, navigate])
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f4f7fa] font-tajawal text-sm text-[#66778b]">
+        جارٍ التحقق من الجلسة...
+      </div>
+    )
+  }
 
   if (!user || user.role !== 'client') return null
 

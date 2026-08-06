@@ -20,7 +20,19 @@ export default function AdminLoginPage() {
   return <main dir="rtl" className="flex min-h-screen items-center justify-center bg-[#f4f7fa] p-4 font-tajawal">
     <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-3xl border border-[#cbd9e5] bg-white p-8 shadow-xl">
       <div className="text-center"><h1 className="font-amiri text-3xl font-bold text-[#102541]">دخول الإدارة</h1><p className="mt-2 text-xs text-[#66778b]">مخصص لفريق المكتب المخوّل فقط</p></div>
-      {error && <div className="rounded-xl bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}
+      {error && (
+        <div className="rounded-xl bg-rose-50 p-3 text-sm text-rose-700 leading-relaxed space-y-2">
+          <p>{error}</p>
+          {error.includes('صلاحية إدارية') && (
+            <p className="text-[11px] text-rose-600/90">
+              في Supabase ← SQL Editor نفّذ:
+              <code className="mt-1 block rounded bg-white/70 p-2 text-[10px] leading-relaxed" dir="ltr">
+                insert into profiles (id, email, full_name_ar, role) values ('&lt;UID&gt;', '{email}', 'اسمك', 'super_admin');
+              </code>
+            </p>
+          )}
+        </div>
+      )}
       <Input type="email" dir="ltr" placeholder="البريد الإداري" value={email} onChange={(e) => setEmail(e.target.value)} required />
       <Input type="password" dir="ltr" placeholder="كلمة المرور" value={password} onChange={(e) => setPassword(e.target.value)} required />
       <Button disabled={loading} className="w-full bg-[#102541] text-white">{loading ? 'جاري الدخول...' : 'دخول الإدارة'}</Button>

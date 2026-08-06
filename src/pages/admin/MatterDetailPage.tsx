@@ -9,6 +9,7 @@ import { StatusBadge } from '../../components/ui/status-badge'
 import { PageHeader } from '../../components/ui/page-header'
 import { Tabs } from '../../components/ui/tabs'
 import { useSEO } from '../../lib/seo'
+import { ActivityTrail } from '../../components/shared/ActivityTrail'
 
 export default function MatterDetailPage() {
   const { id } = useParams()
@@ -122,6 +123,8 @@ export default function MatterDetailPage() {
         </div>
 
       </div>
+
+      <ActivityTrail entityType="matters" entityId={matter.id} />
     </div>
   )
 }

@@ -10,6 +10,7 @@ import { StatusBadge } from '../../components/ui/status-badge'
 import { PageHeader } from '../../components/ui/page-header'
 import { Tabs } from '../../components/ui/tabs'
 import { useSEO } from '../../lib/seo'
+import { ActivityTrail } from '../../components/shared/ActivityTrail'
 
 export default function ClientDetailPage() {
   const { id } = useParams()
@@ -108,6 +109,8 @@ export default function ClientDetailPage() {
         </div>
 
       </div>
+
+      <ActivityTrail entityType="clients" entityId={client.id} />
     </div>
   )
 }

@@ -24,6 +24,7 @@ import { StatusBadge } from '../../components/ui/status-badge'
 import { PageHeader } from '../../components/ui/page-header'
 import { Textarea } from '../../components/ui/textarea'
 import { useSEO } from '../../lib/seo'
+import { ActivityTrail } from '../../components/shared/ActivityTrail'
 
 export default function LeadDetailPage() {
   const { id } = useParams()
@@ -188,6 +189,8 @@ export default function LeadDetailPage() {
         </div>
 
       </div>
+
+      <ActivityTrail entityType="leads" entityId={lead.id} />
     </div>
   )
 }

@@ -102,9 +102,10 @@ export default function App() {
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/privacy" element={<PrivacyPage />} />
                         <Route path="/terms" element={<TermsPage />} />
+                        {/* الحجز داخل التخطيط العام: ترويسة وتنقّل وفوتر كبقية الصفحات */}
+                        <Route path="/book" element={<BookPage />} />
                       </Route>
 
-                      <Route path="/book" element={<BookPage />} />
                       <Route path="/legal-intake" element={<IntakePage />} />
                       <Route path="/login" element={<LoginPage />} />
                       <Route path="/admin-login" element={<AdminLoginPage />} />

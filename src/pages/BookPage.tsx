@@ -1,15 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import {
-  Calendar as CalendarIcon,
-  Video,
-  Building,
-  Phone,
-  CheckCircle2,
-  AlertCircle,
-  Scale,
-  ArrowLeft,
-} from 'lucide-react'
+import { Video, Building, Phone, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react'
 import { useT } from '../lib/i18n'
 import { track } from '../lib/analytics'
 import { createAppointment, createLead } from '../lib/store'
@@ -21,13 +12,13 @@ import { useSEO, breadcrumbLd } from '../lib/seo'
 
 const TIME_SLOTS = ['09:00 ص', '10:30 ص', '01:00 م', '02:30 م', '04:30 م', '06:00 م', '07:30 م']
 
-const LABEL = 'block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500'
+const LABEL = 'block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-2'
 const FIELD =
-  'h-12 w-full rounded-lg border-[#E5D9C5] bg-white text-[15px] text-[#0F172A] placeholder:text-slate-400 placeholder:font-normal focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 transition-colors font-medium'
+  'h-11 w-full rounded-lg border-[#E5D9C5] bg-white text-[14px] text-[#0F172A] placeholder:text-slate-400 placeholder:font-normal focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 transition-colors font-medium'
 
 const MEETING_TYPES = [
-  { id: 'video', icon: Video, ar: 'مرئية عن بُعد', en: 'Video' },
-  { id: 'office', icon: Building, ar: 'حضورية بالمكتب', en: 'In Office' },
+  { id: 'video', icon: Video, ar: 'مرئية', en: 'Video' },
+  { id: 'office', icon: Building, ar: 'بالمكتب', en: 'Office' },
   { id: 'phone', icon: Phone, ar: 'هاتفية', en: 'Phone' },
 ] as const
 
@@ -67,7 +58,7 @@ export default function BookPage() {
     selectedType === 'video'
       ? t('مرئية عبر الفيديو', 'Video call')
       : selectedType === 'office'
-        ? t('حضورية بالمكتب — الرياض', 'In office — Riyadh')
+        ? t('حضورية بالمكتب', 'In office')
         : t('مكالمة هاتفية', 'Phone call')
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,60 +94,40 @@ export default function BookPage() {
     }
   }
 
-  /* ── شاشة التأكيد ────────────────────────────────────────────── */
+  /* ── شاشة التأكيد ────────────────────────────────────────── */
   if (isSuccess) {
     return (
-      <div className="bg-[#FAF9F5] font-tajawal min-h-screen text-[#0F172A] antialiased flex items-center">
-        <div className="max-w-xl mx-auto px-4 sm:px-6 py-24 text-center">
-          <CheckCircle2 className="size-10 text-[#C5A880] mx-auto" strokeWidth={1.25} />
+      <div className="bg-[#FAF9F5] font-tajawal min-h-[80vh] text-[#0F172A] antialiased flex items-center">
+        <div className="max-w-lg mx-auto px-4 py-20 text-center">
+          <CheckCircle2 className="size-9 text-[#C5A880] mx-auto mb-5" strokeWidth={1.25} />
 
-          <div className="flex items-center justify-center gap-4 py-5">
-            <div className="h-px w-14 bg-[#E6DBC9]" />
-            <Scale className="size-4 text-[#C5A880]" strokeWidth={1.5} />
-            <div className="h-px w-14 bg-[#E6DBC9]" />
-          </div>
-
-          <h1 className="font-amiri text-3xl font-bold text-[#0F172A] leading-snug">
+          <h1 className="font-amiri text-[28px] font-bold leading-snug">
             {t('تم استلام طلب الموعد', 'Booking Request Received')}
           </h1>
-
-          <p className="font-tajawal text-[13.5px] text-[#64748B] font-medium leading-[2] mt-4">
+          <p className="text-[13px] text-[#64748B] font-medium leading-[1.9] mt-3">
             {t(
-              'سيراجع الفريق الموعد والبيانات المرسلة، ويصبح الحجز مؤكداً بعد إشعاركم عبر إحدى قنوات التواصل المسجّلة.',
-              'Our team will review your request. The appointment is confirmed only after you receive a confirmation notice.'
+              'سيراجع الفريق الطلب، ويصبح الحجز مؤكداً بعد إشعاركم.',
+              'Our team will review the request; it is confirmed after you are notified.'
             )}
           </p>
 
-          <div className="mt-8 bg-white border border-[#EADFCF] rounded-2xl overflow-hidden text-start">
-            <div className="px-6 py-4 border-b border-[#F1E8DA] flex items-center justify-between gap-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                {t('الرقم المرجعي', 'Reference')}
-              </span>
-              <span className="text-[15px] font-bold text-[#9A7B3E] tracking-wide">{bookingRef}</span>
-            </div>
-            <div className="px-6 py-4 border-b border-[#F1E8DA] flex items-center justify-between gap-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                {t('التخصص', 'Practice Area')}
-              </span>
-              <span className="text-[13.5px] font-semibold text-[#0F172A] text-end">{selectedService}</span>
-            </div>
-            <div className="px-6 py-4 border-b border-[#F1E8DA] flex items-center justify-between gap-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                {t('الموعد', 'Date & Time')}
-              </span>
-              <span className="text-[13.5px] font-semibold text-[#0F172A]">{selectedDate} — {selectedTime}</span>
-            </div>
-            <div className="px-6 py-4 flex items-center justify-between gap-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                {t('طريقة الانعقاد', 'Format')}
-              </span>
-              <span className="text-[13.5px] font-semibold text-[#0F172A]">{typeLabel}</span>
-            </div>
+          <div className="mt-7 bg-white border border-[#EADFCF] rounded-xl divide-y divide-[#F1E8DA] text-start">
+            {[
+              [t('الرقم المرجعي', 'Reference'), bookingRef],
+              [t('التخصص', 'Practice Area'), selectedService],
+              [t('الموعد', 'Date & Time'), `${selectedDate} — ${selectedTime}`],
+              [t('طريقة الانعقاد', 'Format'), typeLabel],
+            ].map(([k, v]) => (
+              <div key={k} className="px-5 py-3.5 flex items-center justify-between gap-4">
+                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 shrink-0">{k}</span>
+                <span className="text-[13px] font-semibold text-end">{v}</span>
+              </div>
+            ))}
           </div>
 
           <Link
             to="/"
-            className="inline-flex items-center gap-2 mt-8 h-11 px-7 rounded-lg bg-[#0B132B] hover:bg-[#16203f] text-white text-[13px] font-bold transition-colors"
+            className="inline-flex items-center gap-2 mt-7 h-11 px-7 rounded-lg bg-[#0B132B] hover:bg-[#16203f] text-white text-[13px] font-bold transition-colors"
           >
             <span>{t('العودة للرئيسية', 'Back to Home')}</span>
             <ArrowLeft className={cn('size-3.5 text-[#D6B57E]', !isRTL && 'rotate-180')} />
@@ -166,269 +137,190 @@ export default function BookPage() {
     )
   }
 
-  /* ── نموذج الحجز ─────────────────────────────────────────────── */
+  /* ── نموذج الحجز — مضغوط في شاشة واحدة ──────────────────── */
   return (
-    <div className="bg-[#FAF9F5] font-tajawal min-h-screen pb-24 text-[#0F172A] antialiased">
+    <div className="bg-[#FAF9F5] font-tajawal min-h-screen pb-16 text-[#0F172A] antialiased">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
 
-      {/* الترويسة — بنفس هوية بقية الصفحات */}
-      <section className="relative pt-20 pb-24 bg-[#0B132B] text-white border-b border-[#C5A880]/30 overflow-hidden mb-16">
-        <div
-          className="absolute inset-0 opacity-5 pointer-events-none"
-          style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #C5A880 1px, transparent 0)', backgroundSize: '24px 24px' }}
-        />
-
-        <div className="max-w-4xl mx-auto px-4 text-center space-y-5 relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C5A880]/20 border border-[#C5A880]/40 text-[#C5A880] text-xs font-bold">
-            <CalendarIcon className="size-4 text-[#C5A880]" />
-            <span>{t('طلب موعد استشارة', 'Consultation Request')}</span>
+        {/* عنوان الصفحة — سطر واحد، بلا ترويسة عملاقة */}
+        <div className="flex flex-wrap items-end justify-between gap-4 pt-10 pb-6 border-b border-[#EADFCF]">
+          <div>
+            <span className="text-[10px] font-bold text-[#C5A880] tracking-[0.22em] uppercase block mb-2">
+              {t('طلب موعد', 'Book an Appointment')}
+            </span>
+            <h1 className="font-amiri text-[26px] sm:text-[30px] font-bold leading-tight">
+              {t('حجز استشارة قانونية', 'Legal Consultation Booking')}
+            </h1>
           </div>
 
-          <h1 className="font-amiri text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
-            {t('احجز جلسة استشارة قانونية', 'Book a Legal Consultation')}
-          </h1>
-
-          <div className="flex items-center justify-center gap-4 py-1">
-            <div className="h-[1px] w-16 bg-[#C5A880]/60" />
-            <Scale className="size-5 text-[#C5A880]" strokeWidth={1.5} />
-            <div className="h-[1px] w-16 bg-[#C5A880]/60" />
-          </div>
-
-          <p className="font-tajawal text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto font-medium">
-            {t(
-              'اختر الموعد وطريقة الانعقاد المناسبة، وسيؤكد الفريق التوفر ونطاق الاستشارة بعد مراجعة الطلب.',
-              'Choose your preferred time and format; availability and scope are confirmed after review.'
-            )}
-          </p>
+          <Link
+            to="/services"
+            className="group inline-flex items-center gap-2 text-[11.5px] font-bold text-[#64748B] hover:text-[#9A7B3E] transition-colors pb-1"
+          >
+            <ArrowLeft className={cn('size-3.5 text-[#C5A880] transition-transform', isRTL ? 'rotate-180 group-hover:translate-x-1' : 'group-hover:-translate-x-1')} />
+            <span>{t('التخصصات', 'Practice Areas')}</span>
+          </Link>
         </div>
-      </section>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-
-        {/* مسار التنقّل — رجوع واضح */}
-        <Link
-          to="/services"
-          className="group inline-flex items-center gap-2 mb-8 text-[12px] font-bold text-[#64748B] hover:text-[#9A7B3E] transition-colors"
-        >
-          <ArrowLeft className={cn('size-3.5 text-[#C5A880] transition-transform', isRTL ? 'rotate-180 group-hover:translate-x-1' : 'group-hover:-translate-x-1')} />
-          <span>{t('العودة إلى التخصصات', 'Back to Practice Areas')}</span>
-        </Link>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-7">
 
           {/* النموذج */}
-          <div className="lg:col-span-8">
-            <div className="bg-white border border-[#EADFCF] rounded-2xl p-8 sm:p-10">
-              <form onSubmit={handleSubmit} className="space-y-9">
+          <form onSubmit={handleSubmit} className="lg:col-span-8 bg-white border border-[#EADFCF] rounded-xl p-6 sm:p-7 space-y-6">
 
-                {error && (
-                  <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 font-medium flex items-center gap-3">
-                    <AlertCircle className="size-4 shrink-0" />
-                    <span>{error}</span>
-                  </div>
-                )}
+            {error && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] text-rose-700 font-medium flex items-center gap-2.5">
+                <AlertCircle className="size-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
 
-                {/* ١ — طريقة الانعقاد */}
-                <div>
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="font-amiri text-lg text-[#C5A880]">01</span>
-                    <span className={LABEL}>{t('طريقة الانعقاد', 'Meeting Format')}</span>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    {MEETING_TYPES.map((type) => {
-                      const Icon = type.icon
-                      const active = selectedType === type.id
-                      return (
-                        <button
-                          key={type.id}
-                          type="button"
-                          onClick={() => setSelectedType(type.id)}
-                          className={cn(
-                            'flex flex-col items-center gap-2.5 rounded-lg border px-3 py-5 transition-colors',
-                            active
-                              ? 'border-[#C5A880] bg-[#FAF5EB] text-[#0F172A]'
-                              : 'border-[#EADFCF] bg-white text-slate-500 hover:border-[#C5A880]/60 hover:bg-[#FCFAF6]'
-                          )}
-                        >
-                          <Icon className={cn('size-5', active ? 'text-[#9A7B3E]' : 'text-[#C5A880]')} strokeWidth={1.5} />
-                          <span className="text-[11.5px] font-bold leading-tight text-center">{t(type.ar, type.en)}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
+            {/* طريقة الانعقاد + التخصص */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <span className={LABEL}>{t('طريقة الانعقاد', 'Format')}</span>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {MEETING_TYPES.map((type) => {
+                    const Icon = type.icon
+                    const active = selectedType === type.id
+                    return (
+                      <button
+                        key={type.id}
+                        type="button"
+                        onClick={() => setSelectedType(type.id)}
+                        className={cn(
+                          'h-11 rounded-lg border flex items-center justify-center gap-1.5 transition-colors',
+                          active
+                            ? 'border-[#C5A880] bg-[#FAF5EB] text-[#0F172A]'
+                            : 'border-[#EADFCF] bg-white text-slate-500 hover:border-[#C5A880]/60'
+                        )}
+                      >
+                        <Icon className={cn('size-4 shrink-0', active ? 'text-[#9A7B3E]' : 'text-[#C5A880]')} strokeWidth={1.5} />
+                        <span className="text-[11.5px] font-bold">{t(type.ar, type.en)}</span>
+                      </button>
+                    )
+                  })}
                 </div>
-
-                {/* ٢ — التخصص */}
-                <div>
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="font-amiri text-lg text-[#C5A880]">02</span>
-                    <span className={LABEL}>{t('التخصص أو الخدمة', 'Practice Area')}</span>
-                  </div>
-
-                  <select
-                    value={selectedService}
-                    onChange={(e) => setSelectedService(e.target.value)}
-                    className={cn(FIELD, 'px-4 cursor-pointer')}
-                  >
-                    {DEMO_SERVICES.map((s) => (
-                      <option key={s.id} value={s.titleAr}>{s.titleAr}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* ٣ — التاريخ والوقت */}
-                <div>
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="font-amiri text-lg text-[#C5A880]">03</span>
-                    <span className={LABEL}>{t('التاريخ والوقت', 'Date & Time')}</span>
-                  </div>
-
-                  <div className="space-y-5">
-                    <div className="space-y-2">
-                      <span className="text-[11px] font-semibold text-slate-500">{t('تاريخ الموعد', 'Date')}</span>
-                      <Input
-                        type="date"
-                        min={new Date().toISOString().split('T')[0]}
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        className={FIELD}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <span className="text-[11px] font-semibold text-slate-500">{t('الأوقات المتاحة', 'Available Slots')}</span>
-                      <div className="flex flex-wrap gap-2">
-                        {TIME_SLOTS.map((slot) => (
-                          <button
-                            type="button"
-                            key={slot}
-                            onClick={() => setSelectedTime(slot)}
-                            className={cn(
-                              'rounded-lg border px-4 py-2.5 text-[12px] font-bold tracking-wide transition-colors',
-                              selectedTime === slot
-                                ? 'border-[#C5A880] bg-[#0B132B] text-[#D6B57E]'
-                                : 'border-[#EADFCF] bg-white text-slate-500 hover:border-[#C5A880]/60 hover:bg-[#FCFAF6]'
-                            )}
-                          >
-                            {slot}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ٤ — بيانات التواصل */}
-                <div className="pt-2 border-t border-[#F1E8DA]">
-                  <div className="flex items-baseline gap-2 mb-4 mt-7">
-                    <span className="font-amiri text-lg text-[#C5A880]">04</span>
-                    <span className={LABEL}>{t('بيانات التواصل', 'Contact Details')}</span>
-                  </div>
-
-                  <div className="space-y-5">
-                    <div className="space-y-2">
-                      <label className={LABEL}>{t('الاسم الكامل', 'Full Name')}</label>
-                      <Input required value={name} onChange={(e) => setName(e.target.value)} className={FIELD} placeholder={t('الاسم الكامل', 'Full name')} />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div className="space-y-2">
-                        <label className={LABEL}>{t('رقم الجوال', 'Mobile')}</label>
-                        <Input required dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} className={cn(FIELD, 'tracking-wide')} placeholder="05XXXXXXXX" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className={LABEL}>{t('البريد الإلكتروني', 'Email')}</label>
-                        <Input required type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} className={FIELD} placeholder="name@domain.com" />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className={LABEL}>{t('نبذة مختصرة عن الموضوع (اختياري)', 'Brief Description (optional)')}</label>
-                      <Textarea
-                        rows={4}
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        className={cn(FIELD, 'h-auto resize-none p-4 leading-relaxed')}
-                        placeholder={t('اذكر موضوع الاستشارة بإيجاز ليطّلع عليه المحامي قبل الموعد...', 'Briefly describe your matter...')}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-4">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="h-12 px-8 bg-[#0B132B] hover:bg-[#16203f] disabled:opacity-60 text-white font-bold rounded-lg text-[15px] transition-colors inline-flex items-center justify-center gap-2.5"
-                  >
-                    <span>{isSubmitting ? t('جارٍ الإرسال...', 'Sending...') : t('تأكيد طلب الحجز', 'Confirm Booking')}</span>
-                    <ArrowLeft className={cn('size-4 text-[#D6B57E]', !isRTL && 'rotate-180')} />
-                  </button>
-
-                  <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
-                    {t(
-                      'الحجز يصبح مؤكداً بعد مراجعة الطلب وإشعاركم. جميع البيانات تخضع للسرية المهنية.',
-                      'The booking is confirmed after review. All data is covered by professional confidentiality.'
-                    )}
-                  </p>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          {/* ملخص الموعد */}
-          <div className="lg:col-span-4 lg:sticky lg:top-28">
-            <div className="bg-[#0B132B] text-white rounded-2xl border border-white/10 overflow-hidden">
-              <div className="px-7 pt-7 pb-5 border-b border-white/10">
-                <span className="text-[10px] font-bold text-[#C5A880] tracking-[0.22em] uppercase block mb-2">
-                  {t('مراجعة الطلب', 'Request Summary')}
-                </span>
-                <h2 className="font-amiri font-bold text-xl text-white leading-snug">
-                  {t('ملخص الموعد', 'Appointment Summary')}
-                </h2>
               </div>
 
               <div>
-                <div className="px-7 py-5 border-b border-white/[0.07]">
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold block mb-1.5">
-                    {t('التخصص المختار', 'Selected Area')}
-                  </span>
-                  <span className="block text-white text-[14px] font-semibold leading-relaxed">{selectedService}</span>
-                </div>
+                <span className={LABEL}>{t('التخصص', 'Practice Area')}</span>
+                <select
+                  value={selectedService}
+                  onChange={(e) => setSelectedService(e.target.value)}
+                  className={cn(FIELD, 'px-3 cursor-pointer')}
+                >
+                  {DEMO_SERVICES.map((s) => (
+                    <option key={s.id} value={s.titleAr}>{s.titleAr}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-                <div className="grid grid-cols-2 border-b border-white/[0.07]">
-                  <div className="px-7 py-5 border-e border-white/[0.07]">
-                    <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold block mb-1.5">
-                      {t('التاريخ', 'Date')}
-                    </span>
-                    <span className="block text-white text-[13.5px] font-semibold tracking-wide">{selectedDate}</span>
-                  </div>
-                  <div className="px-7 py-5">
-                    <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold block mb-1.5">
-                      {t('الوقت', 'Time')}
-                    </span>
-                    <span className="block text-white text-[13.5px] font-semibold tracking-wide">{selectedTime}</span>
-                  </div>
-                </div>
-
-                <div className="px-7 py-5">
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold block mb-1.5">
-                    {t('طريقة الانعقاد', 'Format')}
-                  </span>
-                  <span className="block text-[#D6B57E] text-[14px] font-semibold">{typeLabel}</span>
-                </div>
+            {/* التاريخ + الأوقات */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <span className={LABEL}>{t('التاريخ', 'Date')}</span>
+                <Input
+                  type="date"
+                  min={new Date().toISOString().split('T')[0]}
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className={FIELD}
+                />
               </div>
 
-              <div className="px-7 py-5 bg-white/[0.03] border-t border-white/10">
-                <p className="text-[11px] leading-relaxed text-slate-400 font-medium">
-                  {t(
-                    'مدة الجلسة 45 دقيقة. يُفضّل تجهيز المستندات ذات العلاقة قبل الموعد.',
-                    'Sessions run 45 minutes. Please prepare any relevant documents beforehand.'
-                  )}
+              <div>
+                <span className={LABEL}>{t('الوقت', 'Time')}</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {TIME_SLOTS.map((slot) => (
+                    <button
+                      type="button"
+                      key={slot}
+                      onClick={() => setSelectedTime(slot)}
+                      className={cn(
+                        'rounded-lg border px-2.5 py-2 text-[11px] font-bold tracking-wide transition-colors',
+                        selectedTime === slot
+                          ? 'border-[#C5A880] bg-[#0B132B] text-[#D6B57E]'
+                          : 'border-[#EADFCF] bg-white text-slate-500 hover:border-[#C5A880]/60'
+                      )}
+                    >
+                      {slot}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* بيانات التواصل */}
+            <div className="pt-5 border-t border-[#F1E8DA]">
+              <span className={LABEL}>{t('بيانات التواصل', 'Contact Details')}</span>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <Input required value={name} onChange={(e) => setName(e.target.value)} className={FIELD} placeholder={t('الاسم الكامل', 'Full name')} />
+                <Input required dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} className={cn(FIELD, 'tracking-wide')} placeholder="05XXXXXXXX" />
+                <Input required type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} className={FIELD} placeholder="name@domain.com" />
+              </div>
+
+              <Textarea
+                rows={2}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className={cn(FIELD, 'h-auto resize-none p-3 mt-3 leading-relaxed')}
+                placeholder={t('نبذة مختصرة عن الموضوع (اختياري)', 'Brief description (optional)')}
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="h-11 px-7 bg-[#0B132B] hover:bg-[#16203f] disabled:opacity-60 text-white font-bold rounded-lg text-[14px] transition-colors inline-flex items-center justify-center gap-2.5 shrink-0"
+              >
+                <span>{isSubmitting ? t('جارٍ الإرسال...', 'Sending...') : t('تأكيد الحجز', 'Confirm Booking')}</span>
+                <ArrowLeft className={cn('size-3.5 text-[#D6B57E]', !isRTL && 'rotate-180')} />
+              </button>
+
+              <p className="text-[10.5px] text-slate-500 font-medium leading-relaxed">
+                {t(
+                  'يُؤكَّد الحجز بعد المراجعة. البيانات تخضع للسرية المهنية.',
+                  'Confirmed after review. All data is professionally confidential.'
+                )}
+              </p>
+            </div>
+          </form>
+
+          {/* ملخص الموعد */}
+          <aside className="lg:col-span-4">
+            <div className="bg-[#0B132B] text-white rounded-xl border border-white/10 overflow-hidden lg:sticky lg:top-24">
+              <div className="px-5 py-4 border-b border-white/10">
+                <span className="text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
+                  {t('ملخص الموعد', 'Summary')}
+                </span>
+              </div>
+
+              <div className="divide-y divide-white/[0.07]">
+                {[
+                  [t('التخصص', 'Area'), selectedService],
+                  [t('التاريخ', 'Date'), selectedDate],
+                  [t('الوقت', 'Time'), selectedTime],
+                  [t('الانعقاد', 'Format'), typeLabel],
+                ].map(([k, v], i) => (
+                  <div key={k} className="px-5 py-3.5 flex items-start justify-between gap-3">
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold shrink-0 pt-0.5">{k}</span>
+                    <span className={cn('text-[12.5px] font-semibold text-end leading-relaxed', i === 3 ? 'text-[#D6B57E]' : 'text-white')}>
+                      {v}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="px-5 py-3.5 bg-white/[0.03] border-t border-white/10">
+                <p className="text-[10.5px] leading-relaxed text-slate-400 font-medium">
+                  {t('مدة الجلسة 45 دقيقة — يُفضّل تجهيز المستندات.', 'Sessions run 45 minutes — please prepare documents.')}
                 </p>
               </div>
             </div>
-          </div>
+          </aside>
 
         </div>
       </div>

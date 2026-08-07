@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight, Check, HelpCircle, Settings2, Clock } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../../lib/auth'
 
 // --- Types ---
 export interface TourStep {
@@ -150,17 +151,35 @@ export function TourProvider({ children }: { children: ReactNode }) {
   const [hasCompleted, setHasCompleted] = useState(false)
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
 
+  const { user } = useAuth()
+  const { pathname } = useLocation()
+
+  /**
+   * الجولة التعريفية تشرح شاشات لوحة الإدارة، فلا يجوز أن تظهر لزائر الموقع.
+   * الشرط ثلاثي: مستخدم إداري + داخل مسار /admin + لم يُنهِ الجولة سابقًا.
+   */
+  const isAdminArea = pathname.startsWith('/admin') && pathname !== '/admin-login'
+  const mayRunTour = user?.role === 'admin' && isAdminArea
+
   useEffect(() => {
-    const completed = localStorage.getItem('lawyer_tour_completed') === 'true'
-    setHasCompleted(completed)
-    // Auto-start only for non-mobile if not completed
-    if (!completed && window.innerWidth > 768) {
-      const t = setTimeout(() => setIsActive(true), 2000)
-      return () => clearTimeout(t)
-    }
+    setHasCompleted(localStorage.getItem('lawyer_tour_completed') === 'true')
   }, [])
 
+  useEffect(() => {
+    if (!mayRunTour) {
+      // الخروج من منطقة الإدارة يُنهي أي جولة جارية فورًا
+      setIsActive(false)
+      return
+    }
+    if (localStorage.getItem('lawyer_tour_completed') === 'true') return
+    if (window.innerWidth <= 768) return
+
+    const t = setTimeout(() => setIsActive(true), 2000)
+    return () => clearTimeout(t)
+  }, [mayRunTour])
+
   const startTour = () => {
+    if (!mayRunTour) return
     setCurrentStepIndex(0)
     setIsActive(true)
   }
@@ -189,7 +208,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
     <TourContext.Provider value={{ isActive, startTour, endTour, hasCompleted }}>
       {children}
       <AnimatePresence>
-        {isActive && (
+        {isActive && mayRunTour && (
           <TourOverlay
             step={TOUR_STEPS[currentStepIndex]}
             totalSteps={TOUR_STEPS.length}

@@ -35,9 +35,9 @@ function formatArabicDate(iso: string) {
   return `${String(d).padStart(2, '0')} ${MONTHS_AR[m - 1]} ${y}`
 }
 
-const LABEL = 'block text-[12px] font-bold text-[#0F172A] mb-2'
+const LABEL = 'block text-[11px] font-bold text-[#0F172A] mb-1.5'
 const FIELD =
-  'h-12 w-full rounded-xl border border-[#E8DFCF] bg-white text-[13px] text-[#0F172A] ' +
+  'h-11 w-full rounded-xl border border-[#E8DFCF] bg-white text-[12px] text-[#0F172A] ' +
   'placeholder:text-slate-400 placeholder:font-normal font-medium transition-colors ' +
   'focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/25'
 
@@ -163,26 +163,26 @@ export default function BookPage() {
 
   /* ── نموذج الحجز ─────────────────────────────────────────── */
   return (
-    <div className="bg-[#FAF9F5] font-tajawal min-h-screen pb-16 text-[#0F172A] antialiased">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-12">
+    <div className="bg-[#FAF9F5] font-tajawal min-h-screen pb-10 text-[#0F172A] antialiased">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
 
         {/* العنوان */}
-        <div className="text-center mb-9">
-          <h1 className="font-amiri text-[30px] sm:text-[34px] font-bold leading-tight">
+        <div className="text-center mb-6">
+          <h1 className="font-amiri text-[28px] sm:text-[30px] font-bold leading-tight">
             {t('حجز استشارة قانونية', 'Legal Consultation Booking')}
           </h1>
-          <span className="block h-[2px] w-14 bg-[#C5A880] rounded-full mx-auto mt-3.5 mb-4" />
-          <p className="text-[13px] text-[#7A8699] font-medium">
+          <span className="block h-[2px] w-12 bg-[#C5A880] rounded-full mx-auto mt-2 mb-3" />
+          <p className="text-[12px] text-[#7A8699] font-medium max-w-lg mx-auto">
             {t('اختر الوقت المناسب واملأ بياناتك، وسيتواصل معك أحد محامينا.', 'Pick a suitable time, fill in your details, and one of our lawyers will contact you.')}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
           {/* النموذج */}
           <form
             onSubmit={handleSubmit}
-            className="lg:col-span-8 bg-white border border-[#EFE6D8] rounded-2xl p-6 sm:p-8 space-y-6 shadow-[0_1px_3px_rgba(15,23,42,0.03)]"
+            className="lg:col-span-8 bg-white border border-[#EFE6D8] rounded-2xl p-5 sm:p-6 space-y-4 shadow-[0_1px_3px_rgba(15,23,42,0.03)]"
           >
             {error && (
               <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] text-rose-700 font-medium flex items-center gap-2.5">
@@ -221,14 +221,14 @@ export default function BookPage() {
                         type="button"
                         onClick={() => setSelectedType(type.id)}
                         className={cn(
-                          'h-12 rounded-xl border flex items-center justify-center gap-1.5 transition-colors px-1',
+                          'h-11 rounded-xl border flex items-center justify-center gap-1.5 transition-colors px-1',
                           active
                             ? 'border-[#C5A880] bg-[#FBF6EC] text-[#0F172A]'
                             : 'border-[#E8DFCF] bg-white text-[#64748B] hover:border-[#C5A880]/60'
                         )}
                       >
-                        <Icon className={cn('size-4 shrink-0', active ? 'text-[#B08A45]' : 'text-[#9AA5B4]')} strokeWidth={1.6} />
-                        <span className="text-[11.5px] font-bold">{t(type.ar, type.en)}</span>
+                        <Icon className={cn('size-3.5 shrink-0', active ? 'text-[#B08A45]' : 'text-[#9AA5B4]')} strokeWidth={1.8} />
+                        <span className="text-[11px] font-bold">{t(type.ar, type.en)}</span>
                       </button>
                     )
                   })}
@@ -262,7 +262,7 @@ export default function BookPage() {
                       key={slot}
                       onClick={() => setSelectedTime(slot)}
                       className={cn(
-                        'h-11 rounded-xl border flex items-center justify-center gap-1.5 text-[11.5px] font-bold tracking-wide transition-colors',
+                        'h-10 rounded-xl border flex items-center justify-center gap-1.5 text-[11px] font-bold tracking-wide transition-colors',
                         active
                           ? 'border-[#0B1E33] bg-[#0B1E33] text-white'
                           : 'border-[#E8DFCF] bg-white text-[#64748B] hover:border-[#C5A880]/60'
@@ -322,20 +322,20 @@ export default function BookPage() {
             <div>
               <label className={LABEL}>{t('نبذة مختصرة عن موضوع الاستشارة (اختياري)', 'Brief description (optional)')}</label>
               <textarea
-                rows={3}
+                rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className={cn(FIELD, 'h-auto resize-none p-4 leading-relaxed')}
+                className={cn(FIELD, 'h-auto resize-none p-3 leading-relaxed text-[12px]')}
                 placeholder={t('اكتب بإيجاز عن موضوع استشارتك...', 'Briefly describe your matter...')}
               />
             </div>
 
             {/* التأكيد */}
-            <div className="pt-1 space-y-3">
+            <div className="pt-2 space-y-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mx-auto flex h-[52px] w-full max-w-[340px] items-center justify-center gap-3 rounded-xl bg-[#0B1E33] text-[15px] font-bold text-white transition-colors hover:bg-[#16294a] disabled:opacity-60"
+                className="mx-auto flex h-11 w-full max-w-[340px] items-center justify-center gap-3 rounded-xl bg-[#0B1E33] text-[13px] font-bold text-white transition-colors hover:bg-[#16294a] disabled:opacity-60"
               >
                 <span>{isSubmitting ? t('جارٍ الإرسال...', 'Sending...') : t('تأكيد الحجز', 'Confirm Booking')}</span>
                 <ArrowLeft className={cn('size-4 text-[#D6B57E]', !isRTL && 'rotate-180')} />
@@ -350,37 +350,36 @@ export default function BookPage() {
 
           {/* ملخص الحجز */}
           <aside className="lg:col-span-4">
-            <div className="bg-[#0B1E33] text-white rounded-2xl overflow-hidden lg:sticky lg:top-24">
-              <div className="px-6 pt-7 pb-6 flex items-center justify-between gap-3">
-                <h2 className="font-amiri text-[19px] font-bold text-white">
+            <div className="bg-[#0B1E33] text-white rounded-2xl overflow-hidden lg:sticky lg:top-24 shadow-sm">
+              <div className="px-5 pt-5 pb-4 flex items-center justify-between gap-3">
+                <h2 className="font-amiri text-[17px] font-bold text-white">
                   {t('ملخص الحجز', 'Booking Summary')}
                 </h2>
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#C5A880]/40 bg-white/[0.04]">
-                  <CalendarIcon className="size-[18px] text-[#D6B57E]" strokeWidth={1.5} />
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[#C5A880]/40 bg-white/[0.04]">
+                  <CalendarIcon className="size-[15px] text-[#D6B57E]" strokeWidth={1.5} />
                 </span>
               </div>
 
-              <div className="px-6">
+              <div className="px-5 pb-2">
                 {[
                   [t('التخصص', 'Practice Area'), selectedService, false],
                   [t('التاريخ', 'Date'), formatArabicDate(selectedDate), false],
                   [t('الوقت', 'Time'), selectedTime, false],
                   [t('طريقة الانعقاد', 'Format'), typeLabel, true],
-                  [t('مدة الجلسة', 'Duration'), t('45 دقيقة', '45 minutes'), false],
                 ].map(([label, value, gold]) => (
-                  <div key={label as string} className="border-t border-white/[0.09] py-4">
-                    <span className="block text-[11px] text-slate-400 font-medium mb-1.5">{label as string}</span>
-                    <span className={cn('block text-[13.5px] font-bold leading-relaxed', gold ? 'text-[#D6B57E]' : 'text-white')}>
+                  <div key={label as string} className="border-t border-white/[0.09] py-3">
+                    <span className="block text-[10px] text-slate-400 font-medium mb-1">{label as string}</span>
+                    <span className={cn('block text-[12.5px] font-bold leading-snug', gold ? 'text-[#D6B57E]' : 'text-white')}>
                       {value as string}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="mx-6 mb-6 mt-2 flex items-start gap-2 border-t border-white/[0.09] pt-4">
+              <div className="mx-5 mb-5 mt-1 flex items-start gap-2 border-t border-white/[0.09] pt-3">
                 <Info className="size-3.5 shrink-0 text-slate-500 mt-0.5" strokeWidth={2} />
-                <p className="text-[11px] leading-relaxed text-slate-400 font-medium">
-                  {t('سيتم تأكيد الحجز بعد إرسال الطلب', 'Your booking is confirmed after review')}
+                <p className="text-[10px] leading-relaxed text-slate-400 font-medium">
+                  {t('تفضل بتجهيز المستندات الداعمة لاستشارتك (إن وجدت).', 'Please prepare any supporting documents (if applicable).')}
                 </p>
               </div>
             </div>

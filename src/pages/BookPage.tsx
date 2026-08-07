@@ -1,24 +1,49 @@
 import React, { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Video, Building, Phone, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react'
+import {
+  Video,
+  Building2,
+  Phone,
+  User,
+  Mail,
+  Calendar as CalendarIcon,
+  CheckCircle2,
+  AlertCircle,
+  ArrowLeft,
+  Info,
+  Lock,
+  ChevronDown,
+} from 'lucide-react'
 import { useT } from '../lib/i18n'
 import { track } from '../lib/analytics'
 import { createAppointment, createLead } from '../lib/store'
 import { DEMO_SERVICES } from '../data/demo'
-import { Input } from '../components/ui/input'
-import { Textarea } from '../components/ui/textarea'
 import { cn } from '../lib/utils'
 import { useSEO, breadcrumbLd } from '../lib/seo'
 
-const TIME_SLOTS = ['09:00 ص', '10:30 ص', '01:00 م', '02:30 م', '04:30 م', '06:00 م', '07:30 م']
+const TIME_SLOTS = ['09:00 ص', '10:30 ص', '02:30 م', '04:30 م', '06:30 م', '07:30 م']
 
-const LABEL = 'block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-2'
+const MONTHS_AR = [
+  'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+  'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+]
+
+/** 2026-08-07 → 07 أغسطس 2026 */
+function formatArabicDate(iso: string) {
+  const [y, m, d] = iso.split('-').map(Number)
+  if (!y || !m || !d) return iso
+  return `${String(d).padStart(2, '0')} ${MONTHS_AR[m - 1]} ${y}`
+}
+
+const LABEL = 'block text-[12px] font-bold text-[#0F172A] mb-2'
 const FIELD =
-  'h-11 w-full rounded-lg border-[#E5D9C5] bg-white text-[14px] text-[#0F172A] placeholder:text-slate-400 placeholder:font-normal focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 transition-colors font-medium'
+  'h-12 w-full rounded-xl border border-[#E8DFCF] bg-white text-[13px] text-[#0F172A] ' +
+  'placeholder:text-slate-400 placeholder:font-normal font-medium transition-colors ' +
+  'focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/25'
 
 const MEETING_TYPES = [
   { id: 'video', icon: Video, ar: 'مرئية', en: 'Video' },
-  { id: 'office', icon: Building, ar: 'بالمكتب', en: 'Office' },
+  { id: 'office', icon: Building2, ar: 'بالمكتب', en: 'Office' },
   { id: 'phone', icon: Phone, ar: 'هاتفية', en: 'Phone' },
 ] as const
 
@@ -56,10 +81,10 @@ export default function BookPage() {
 
   const typeLabel =
     selectedType === 'video'
-      ? t('مرئية عبر الفيديو', 'Video call')
+      ? t('مرئية', 'Video')
       : selectedType === 'office'
-        ? t('حضورية بالمكتب', 'In office')
-        : t('مكالمة هاتفية', 'Phone call')
+        ? t('بالمكتب', 'In office')
+        : t('هاتفية', 'Phone')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -99,86 +124,94 @@ export default function BookPage() {
     return (
       <div className="bg-[#FAF9F5] font-tajawal min-h-[80vh] text-[#0F172A] antialiased flex items-center">
         <div className="max-w-lg mx-auto px-4 py-20 text-center">
-          <CheckCircle2 className="size-9 text-[#C5A880] mx-auto mb-5" strokeWidth={1.25} />
+          <CheckCircle2 className="size-10 text-[#C5A880] mx-auto mb-5" strokeWidth={1.25} />
 
-          <h1 className="font-amiri text-[28px] font-bold leading-snug">
-            {t('تم استلام طلب الموعد', 'Booking Request Received')}
+          <h1 className="font-amiri text-[30px] font-bold leading-snug">
+            {t('تم استلام طلب الحجز', 'Booking Request Received')}
           </h1>
-          <p className="text-[13px] text-[#64748B] font-medium leading-[1.9] mt-3">
-            {t(
-              'سيراجع الفريق الطلب، ويصبح الحجز مؤكداً بعد إشعاركم.',
-              'Our team will review the request; it is confirmed after you are notified.'
-            )}
+          <span className="block h-px w-16 bg-[#C5A880] mx-auto my-4" />
+          <p className="text-[13px] text-[#64748B] font-medium leading-[1.9]">
+            {t('سيراجع الفريق طلبك، ويصبح الحجز مؤكداً بعد إشعارك.', 'Our team will review your request; it is confirmed once you are notified.')}
           </p>
 
-          <div className="mt-7 bg-white border border-[#EADFCF] rounded-xl divide-y divide-[#F1E8DA] text-start">
+          <div className="mt-7 bg-white border border-[#EADFCF] rounded-2xl divide-y divide-[#F1E8DA] text-start overflow-hidden">
             {[
               [t('الرقم المرجعي', 'Reference'), bookingRef],
               [t('التخصص', 'Practice Area'), selectedService],
-              [t('الموعد', 'Date & Time'), `${selectedDate} — ${selectedTime}`],
+              [t('التاريخ', 'Date'), formatArabicDate(selectedDate)],
+              [t('الوقت', 'Time'), selectedTime],
               [t('طريقة الانعقاد', 'Format'), typeLabel],
             ].map(([k, v]) => (
-              <div key={k} className="px-5 py-3.5 flex items-center justify-between gap-4">
-                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 shrink-0">{k}</span>
-                <span className="text-[13px] font-semibold text-end">{v}</span>
+              <div key={k} className="px-6 py-4 flex items-center justify-between gap-4">
+                <span className="text-[11px] font-semibold text-slate-400 shrink-0">{k}</span>
+                <span className="text-[13px] font-bold text-end">{v}</span>
               </div>
             ))}
           </div>
 
           <Link
             to="/"
-            className="inline-flex items-center gap-2 mt-7 h-11 px-7 rounded-lg bg-[#0B132B] hover:bg-[#16203f] text-white text-[13px] font-bold transition-colors"
+            className="inline-flex items-center gap-2 mt-7 h-12 px-8 rounded-xl bg-[#0B1E33] hover:bg-[#16294a] text-white text-[13px] font-bold transition-colors"
           >
             <span>{t('العودة للرئيسية', 'Back to Home')}</span>
-            <ArrowLeft className={cn('size-3.5 text-[#D6B57E]', !isRTL && 'rotate-180')} />
+            <ArrowLeft className={cn('size-4 text-[#D6B57E]', !isRTL && 'rotate-180')} />
           </Link>
         </div>
       </div>
     )
   }
 
-  /* ── نموذج الحجز — مضغوط في شاشة واحدة ──────────────────── */
+  /* ── نموذج الحجز ─────────────────────────────────────────── */
   return (
     <div className="bg-[#FAF9F5] font-tajawal min-h-screen pb-16 text-[#0F172A] antialiased">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-12">
 
-        {/* عنوان الصفحة — سطر واحد، بلا ترويسة عملاقة */}
-        <div className="flex flex-wrap items-end justify-between gap-4 pt-10 pb-6 border-b border-[#EADFCF]">
-          <div>
-            <span className="text-[10px] font-bold text-[#C5A880] tracking-[0.22em] uppercase block mb-2">
-              {t('طلب موعد', 'Book an Appointment')}
-            </span>
-            <h1 className="font-amiri text-[26px] sm:text-[30px] font-bold leading-tight">
-              {t('حجز استشارة قانونية', 'Legal Consultation Booking')}
-            </h1>
-          </div>
-
-          <Link
-            to="/services"
-            className="group inline-flex items-center gap-2 text-[11.5px] font-bold text-[#64748B] hover:text-[#9A7B3E] transition-colors pb-1"
-          >
-            <ArrowLeft className={cn('size-3.5 text-[#C5A880] transition-transform', isRTL ? 'rotate-180 group-hover:translate-x-1' : 'group-hover:-translate-x-1')} />
-            <span>{t('التخصصات', 'Practice Areas')}</span>
-          </Link>
+        {/* العنوان */}
+        <div className="text-center mb-9">
+          <h1 className="font-amiri text-[30px] sm:text-[34px] font-bold leading-tight">
+            {t('حجز استشارة قانونية', 'Legal Consultation Booking')}
+          </h1>
+          <span className="block h-[2px] w-14 bg-[#C5A880] rounded-full mx-auto mt-3.5 mb-4" />
+          <p className="text-[13px] text-[#7A8699] font-medium">
+            {t('اختر الوقت المناسب واملأ بياناتك، وسيتواصل معك أحد محامينا.', 'Pick a suitable time, fill in your details, and one of our lawyers will contact you.')}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-7">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
           {/* النموذج */}
-          <form onSubmit={handleSubmit} className="lg:col-span-8 bg-white border border-[#EADFCF] rounded-xl p-6 sm:p-7 space-y-6">
-
+          <form
+            onSubmit={handleSubmit}
+            className="lg:col-span-8 bg-white border border-[#EFE6D8] rounded-2xl p-6 sm:p-8 space-y-6 shadow-[0_1px_3px_rgba(15,23,42,0.03)]"
+          >
             {error && (
-              <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] text-rose-700 font-medium flex items-center gap-2.5">
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] text-rose-700 font-medium flex items-center gap-2.5">
                 <AlertCircle className="size-4 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
-            {/* طريقة الانعقاد + التخصص */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <span className={LABEL}>{t('طريقة الانعقاد', 'Format')}</span>
-                <div className="grid grid-cols-3 gap-1.5">
+            {/* التخصص · طريقة الانعقاد · التاريخ */}
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+              <div className="sm:col-span-5">
+                <label className={LABEL}>{t('التخصص', 'Practice Area')}</label>
+                <div className="relative">
+                  <select
+                    value={selectedService}
+                    onChange={(e) => setSelectedService(e.target.value)}
+                    className={cn(FIELD, 'appearance-none cursor-pointer ps-4 pe-10')}
+                  >
+                    {DEMO_SERVICES.map((s) => (
+                      <option key={s.id} value={s.titleAr}>{s.titleAr}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute end-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                </div>
+              </div>
+
+              <div className="sm:col-span-4">
+                <label className={LABEL}>{t('طريقة الانعقاد', 'Format')}</label>
+                <div className="grid grid-cols-3 gap-2">
                   {MEETING_TYPES.map((type) => {
                     const Icon = type.icon
                     const active = selectedType === type.id
@@ -188,13 +221,13 @@ export default function BookPage() {
                         type="button"
                         onClick={() => setSelectedType(type.id)}
                         className={cn(
-                          'h-11 rounded-lg border flex items-center justify-center gap-1.5 transition-colors',
+                          'h-12 rounded-xl border flex items-center justify-center gap-1.5 transition-colors px-1',
                           active
-                            ? 'border-[#C5A880] bg-[#FAF5EB] text-[#0F172A]'
-                            : 'border-[#EADFCF] bg-white text-slate-500 hover:border-[#C5A880]/60'
+                            ? 'border-[#C5A880] bg-[#FBF6EC] text-[#0F172A]'
+                            : 'border-[#E8DFCF] bg-white text-[#64748B] hover:border-[#C5A880]/60'
                         )}
                       >
-                        <Icon className={cn('size-4 shrink-0', active ? 'text-[#9A7B3E]' : 'text-[#C5A880]')} strokeWidth={1.5} />
+                        <Icon className={cn('size-4 shrink-0', active ? 'text-[#B08A45]' : 'text-[#9AA5B4]')} strokeWidth={1.6} />
                         <span className="text-[11.5px] font-bold">{t(type.ar, type.en)}</span>
                       </button>
                     )
@@ -202,121 +235,152 @@ export default function BookPage() {
                 </div>
               </div>
 
-              <div>
-                <span className={LABEL}>{t('التخصص', 'Practice Area')}</span>
-                <select
-                  value={selectedService}
-                  onChange={(e) => setSelectedService(e.target.value)}
-                  className={cn(FIELD, 'px-3 cursor-pointer')}
-                >
-                  {DEMO_SERVICES.map((s) => (
-                    <option key={s.id} value={s.titleAr}>{s.titleAr}</option>
-                  ))}
-                </select>
+              <div className="sm:col-span-3">
+                <label className={LABEL}>{t('التاريخ', 'Date')}</label>
+                <div className="relative">
+                  <CalendarIcon className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 size-4 text-[#9AA5B4]" strokeWidth={1.6} />
+                  <input
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className={cn(FIELD, 'ps-10 pe-3')}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* التاريخ + الأوقات */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <span className={LABEL}>{t('التاريخ', 'Date')}</span>
-                <Input
-                  type="date"
-                  min={new Date().toISOString().split('T')[0]}
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className={FIELD}
-                />
-              </div>
-
-              <div>
-                <span className={LABEL}>{t('الوقت', 'Time')}</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {TIME_SLOTS.map((slot) => (
+            {/* الوقت */}
+            <div>
+              <label className={LABEL}>{t('الوقت', 'Time')}</label>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {TIME_SLOTS.map((slot) => {
+                  const active = selectedTime === slot
+                  return (
                     <button
                       type="button"
                       key={slot}
                       onClick={() => setSelectedTime(slot)}
                       className={cn(
-                        'rounded-lg border px-2.5 py-2 text-[11px] font-bold tracking-wide transition-colors',
-                        selectedTime === slot
-                          ? 'border-[#C5A880] bg-[#0B132B] text-[#D6B57E]'
-                          : 'border-[#EADFCF] bg-white text-slate-500 hover:border-[#C5A880]/60'
+                        'h-11 rounded-xl border flex items-center justify-center gap-1.5 text-[11.5px] font-bold tracking-wide transition-colors',
+                        active
+                          ? 'border-[#0B1E33] bg-[#0B1E33] text-white'
+                          : 'border-[#E8DFCF] bg-white text-[#64748B] hover:border-[#C5A880]/60'
                       )}
                     >
-                      {slot}
+                      <span>{slot}</span>
+                      {active && <CheckCircle2 className="size-3.5 text-[#D6B57E] shrink-0" />}
                     </button>
-                  ))}
-                </div>
+                  )
+                })}
               </div>
             </div>
 
             {/* بيانات التواصل */}
-            <div className="pt-5 border-t border-[#F1E8DA]">
-              <span className={LABEL}>{t('بيانات التواصل', 'Contact Details')}</span>
-
+            <div>
+              <label className={LABEL}>{t('بيانات التواصل', 'Contact Details')}</label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <Input required value={name} onChange={(e) => setName(e.target.value)} className={FIELD} placeholder={t('الاسم الكامل', 'Full name')} />
-                <Input required dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} className={cn(FIELD, 'tracking-wide')} placeholder="05XXXXXXXX" />
-                <Input required type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} className={FIELD} placeholder="name@domain.com" />
-              </div>
+                <div className="relative">
+                  <User className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 size-4 text-[#9AA5B4]" strokeWidth={1.6} />
+                  <input
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className={cn(FIELD, 'ps-10 pe-3')}
+                    placeholder={t('الاسم الكامل', 'Full name')}
+                  />
+                </div>
 
-              <Textarea
-                rows={2}
+                <div className="relative">
+                  <Phone className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 size-4 text-[#9AA5B4]" strokeWidth={1.6} />
+                  <input
+                    required
+                    dir="ltr"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className={cn(FIELD, 'ps-10 pe-3 text-end tracking-wide')}
+                    placeholder="05XXXXXXXX"
+                  />
+                </div>
+
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 size-4 text-[#9AA5B4]" strokeWidth={1.6} />
+                  <input
+                    required
+                    type="email"
+                    dir="ltr"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={cn(FIELD, 'ps-10 pe-3 text-end')}
+                    placeholder="name@domain.com"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* نبذة */}
+            <div>
+              <label className={LABEL}>{t('نبذة مختصرة عن موضوع الاستشارة (اختياري)', 'Brief description (optional)')}</label>
+              <textarea
+                rows={3}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className={cn(FIELD, 'h-auto resize-none p-3 mt-3 leading-relaxed')}
-                placeholder={t('نبذة مختصرة عن الموضوع (اختياري)', 'Brief description (optional)')}
+                className={cn(FIELD, 'h-auto resize-none p-4 leading-relaxed')}
+                placeholder={t('اكتب بإيجاز عن موضوع استشارتك...', 'Briefly describe your matter...')}
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+            {/* التأكيد */}
+            <div className="pt-1 space-y-3">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-11 px-7 bg-[#0B132B] hover:bg-[#16203f] disabled:opacity-60 text-white font-bold rounded-lg text-[14px] transition-colors inline-flex items-center justify-center gap-2.5 shrink-0"
+                className="mx-auto flex h-[52px] w-full max-w-[340px] items-center justify-center gap-3 rounded-xl bg-[#0B1E33] text-[15px] font-bold text-white transition-colors hover:bg-[#16294a] disabled:opacity-60"
               >
                 <span>{isSubmitting ? t('جارٍ الإرسال...', 'Sending...') : t('تأكيد الحجز', 'Confirm Booking')}</span>
-                <ArrowLeft className={cn('size-3.5 text-[#D6B57E]', !isRTL && 'rotate-180')} />
+                <ArrowLeft className={cn('size-4 text-[#D6B57E]', !isRTL && 'rotate-180')} />
               </button>
 
-              <p className="text-[10.5px] text-slate-500 font-medium leading-relaxed">
-                {t(
-                  'يُؤكَّد الحجز بعد المراجعة. البيانات تخضع للسرية المهنية.',
-                  'Confirmed after review. All data is professionally confidential.'
-                )}
+              <p className="flex items-center justify-center gap-1.5 text-[11px] text-[#94A3B8] font-medium">
+                <Lock className="size-3 shrink-0" strokeWidth={2} />
+                <span>{t('نستخدم بياناتك فقط لحجز الاستشارة والتواصل معك.', 'Your data is used only to arrange the consultation.')}</span>
               </p>
             </div>
           </form>
 
-          {/* ملخص الموعد */}
+          {/* ملخص الحجز */}
           <aside className="lg:col-span-4">
-            <div className="bg-[#0B132B] text-white rounded-xl border border-white/10 overflow-hidden lg:sticky lg:top-24">
-              <div className="px-5 py-4 border-b border-white/10">
-                <span className="text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
-                  {t('ملخص الموعد', 'Summary')}
+            <div className="bg-[#0B1E33] text-white rounded-2xl overflow-hidden lg:sticky lg:top-24">
+              <div className="px-6 pt-7 pb-6 flex items-center justify-between gap-3">
+                <h2 className="font-amiri text-[19px] font-bold text-white">
+                  {t('ملخص الحجز', 'Booking Summary')}
+                </h2>
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#C5A880]/40 bg-white/[0.04]">
+                  <CalendarIcon className="size-[18px] text-[#D6B57E]" strokeWidth={1.5} />
                 </span>
               </div>
 
-              <div className="divide-y divide-white/[0.07]">
+              <div className="px-6">
                 {[
-                  [t('التخصص', 'Area'), selectedService],
-                  [t('التاريخ', 'Date'), selectedDate],
-                  [t('الوقت', 'Time'), selectedTime],
-                  [t('الانعقاد', 'Format'), typeLabel],
-                ].map(([k, v], i) => (
-                  <div key={k} className="px-5 py-3.5 flex items-start justify-between gap-3">
-                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold shrink-0 pt-0.5">{k}</span>
-                    <span className={cn('text-[12.5px] font-semibold text-end leading-relaxed', i === 3 ? 'text-[#D6B57E]' : 'text-white')}>
-                      {v}
+                  [t('التخصص', 'Practice Area'), selectedService, false],
+                  [t('التاريخ', 'Date'), formatArabicDate(selectedDate), false],
+                  [t('الوقت', 'Time'), selectedTime, false],
+                  [t('طريقة الانعقاد', 'Format'), typeLabel, true],
+                  [t('مدة الجلسة', 'Duration'), t('45 دقيقة', '45 minutes'), false],
+                ].map(([label, value, gold]) => (
+                  <div key={label as string} className="border-t border-white/[0.09] py-4">
+                    <span className="block text-[11px] text-slate-400 font-medium mb-1.5">{label as string}</span>
+                    <span className={cn('block text-[13.5px] font-bold leading-relaxed', gold ? 'text-[#D6B57E]' : 'text-white')}>
+                      {value as string}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="px-5 py-3.5 bg-white/[0.03] border-t border-white/10">
-                <p className="text-[10.5px] leading-relaxed text-slate-400 font-medium">
-                  {t('مدة الجلسة 45 دقيقة — يُفضّل تجهيز المستندات.', 'Sessions run 45 minutes — please prepare documents.')}
+              <div className="mx-6 mb-6 mt-2 flex items-start gap-2 border-t border-white/[0.09] pt-4">
+                <Info className="size-3.5 shrink-0 text-slate-500 mt-0.5" strokeWidth={2} />
+                <p className="text-[11px] leading-relaxed text-slate-400 font-medium">
+                  {t('سيتم تأكيد الحجز بعد إرسال الطلب', 'Your booking is confirmed after review')}
                 </p>
               </div>
             </div>

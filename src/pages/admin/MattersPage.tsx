@@ -30,9 +30,15 @@ export default function MattersPage() {
       <PageHeader
         title={t('سجل القضايا والمعاملات النشطة', 'Legal Matters & Cases')}
         description={t('إدارة ملفات المرافعة والعقود والاستشارات مع المواعيد والمحاكم', 'Manage active court litigation & contract matters')}
+        action={
+          <Button id="tour-matters-add" size="sm" className="bg-navy text-white hover:bg-navy-light gap-2">
+            <Plus className="size-4" />
+            <span>{t('إضافة قضية جديدة', 'Add Matter')}</span>
+          </Button>
+        }
       />
 
-      <Card className="p-4 bg-white border-border">
+      <Card id="tour-matters-filter" className="p-4 bg-white border-border">
         <div className="relative max-w-md">
           <Search className="absolute start-3 top-2.5 size-4 text-ink-muted" />
           <Input
@@ -44,7 +50,7 @@ export default function MattersPage() {
         </div>
       </Card>
 
-      <Card className="bg-white border-border overflow-hidden">
+      <Card id="tour-matters-table" className="bg-white border-border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>

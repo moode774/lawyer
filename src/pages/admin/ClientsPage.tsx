@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, ExternalLink } from 'lucide-react'
+import { Search, ExternalLink, Plus } from 'lucide-react'
 import { useT } from '../../lib/i18n'
 import { store } from '../../lib/store'
 import { Client } from '../../types'
@@ -30,9 +30,15 @@ export default function ClientsPage() {
       <PageHeader
         title={t('سجل العملاء المعتمدين', 'Clients Database')}
         description={t('جميع العملاء والأشخاص الاكتسابيين مع ربط القضايا والمستندات', 'Verified clients with associated legal matters')}
+        action={
+          <Button id="tour-clients-add" size="sm" className="bg-navy text-white hover:bg-navy-light gap-2">
+            <Plus className="size-4" />
+            <span>{t('إضافة عميل جديد', 'Add Client')}</span>
+          </Button>
+        }
       />
 
-      <Card className="p-4 bg-white border-border">
+      <Card id="tour-clients-search" className="p-4 bg-white border-border">
         <div className="relative max-w-md">
           <Search className="absolute start-3 top-2.5 size-4 text-ink-muted" />
           <Input
@@ -44,7 +50,7 @@ export default function ClientsPage() {
         </div>
       </Card>
 
-      <Card className="bg-white border-border overflow-hidden">
+      <Card id="tour-clients-table" className="bg-white border-border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>

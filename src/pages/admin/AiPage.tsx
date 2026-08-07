@@ -112,6 +112,7 @@ export default function AiPage() {
             <div className="space-y-2 pt-2">
               <label className="text-sm font-semibold text-ink block">{t('أكتب استفسارك أو طلبك المخصص', 'Custom Prompt / Query')}</label>
               <Textarea
+                id="tour-ai-input"
                 rows={4}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -120,6 +121,7 @@ export default function AiPage() {
             </div>
 
             <Button
+              id="tour-ai-run"
               disabled={isLoading || !prompt.trim()}
               onClick={() => handleExecutePrompt(prompt)}
               className="w-full bg-navy text-white hover:bg-navy-light font-bold py-3"

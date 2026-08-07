@@ -95,7 +95,7 @@ function GlobalSearch() {
   }
 
   return (
-    <div ref={ref} className="relative w-full max-w-md font-tajawal">
+    <div ref={ref} id="tour-step-search" className="relative w-full max-w-md font-tajawal">
       <div className="relative flex items-center">
         <Search className="absolute start-4 size-4.5 text-[#527094] pointer-events-none z-10" />
         <input
@@ -164,7 +164,7 @@ function NotificationBell() {
   }, [])
 
   return (
-    <div ref={ref} className="relative font-tajawal flex items-center gap-2">
+    <div ref={ref} id="tour-step-notifications" className="relative font-tajawal flex items-center gap-2">
       <button
         onClick={() => setOpen(!open)}
         className="relative rounded-2xl p-2.5 text-[#1C2B48] bg-[#E8ECEF]/80 hover:bg-[#E8ECEF] transition-colors cursor-pointer border border-[#C4D8E5]/60"
@@ -260,11 +260,12 @@ export default function AdminLayout() {
         </p>
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-4 scrollbar-thin" aria-label="قائمة الإدارة">
+      <nav id="tour-step-sidebar" className="flex-1 space-y-1 overflow-y-auto p-4 scrollbar-thin" aria-label="قائمة الإدارة">
         {nav.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
+            id={`tour-nav-${item.to === '/admin' ? 'admin' : item.to.split('/').pop()}`}
             end={item.end}
             className={({ isActive }) =>
               cn(
@@ -284,6 +285,7 @@ export default function AdminLayout() {
       {/* Sidebar Footer Support Button */}
       <div className="p-4 border-t border-[#8EB1D1]/20 bg-[#131e33]/50 space-y-3">
         <button
+          id="tour-nav-support"
           onClick={() => navigate('/admin/settings')}
           className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/10 border border-white/15 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer"
         >
@@ -293,7 +295,7 @@ export default function AdminLayout() {
           </span>
         </button>
 
-        <div className="flex items-center justify-between px-2 pt-1 text-xs">
+        <div id="tour-nav-profile" className="flex items-center justify-between px-2 pt-1 text-xs">
           <div className="flex items-center gap-2">
             <Avatar name={user.name} color="#8EB1D1" />
             <span className="text-white text-xs font-bold truncate max-w-[100px]">{user.name}</span>

@@ -52,6 +52,7 @@ import {
   SlidersHorizontal
 } from 'lucide-react'
 import { useSEO } from '../../lib/seo'
+import { useT } from '../../lib/i18n'
 import { Card } from '../../components/ui/card'
 import { BRAND } from '../../config/brand'
 import {
@@ -103,6 +104,7 @@ const PLATFORM_INFO: Record<PlatformId, { name: string; color: string; bg: strin
 }
 
 export default function MarketingPage() {
+  const { t } = useT()
   useSEO({ title: 'مركز التسويق الذكي | بن نوح للمحاماة' })
   const queryClient = useQueryClient()
 
@@ -123,75 +125,64 @@ export default function MarketingPage() {
 
   return (
     <div className="space-y-8 pb-20 font-tajawal selection:bg-[#C4A35A] selection:text-white">
-      {/* Dynamic Glassmorphism Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1C2B48] via-[#152238] to-[#0D1526] p-6 sm:p-8 text-white shadow-2xl border border-white/10">
-        <div className="absolute -end-16 -top-16 size-72 rounded-full bg-[#C4A35A]/10 blur-3xl pointer-events-none" />
-        <div className="absolute -start-16 -bottom-16 size-72 rounded-full bg-[#8EB1D1]/10 blur-3xl pointer-events-none" />
+      {/* Formal Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 border-b border-border/60 pb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-ink tracking-tight flex items-center gap-2">
+            <Megaphone className="size-6 text-navy" />
+            {t('مركز التسويق', 'Marketing Center')}
+          </h1>
+          <p className="text-sm text-ink-muted mt-1">
+            {t('إدارة الحملات الإعلانية وصناعة المحتوى وتتبع العوائد والاستثمارات', 'Manage ad campaigns, content creation, and track ROAS')}
+          </p>
+        </div>
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <span className="flex items-center justify-center size-12 rounded-2xl bg-gradient-to-tr from-[#C4A35A] to-[#E6C687] text-[#1C2B48] shadow-lg font-bold">
-                <Megaphone className="size-6" />
-              </span>
-              <div>
-                <h1 className="font-amiri text-3xl sm:text-4xl font-bold tracking-wide text-white">
-                  مركز التسويق الذكي
-                </h1>
-                <p className="text-xs text-[#C4D8E5] font-medium mt-0.5">
-                  منظومة التحكم التسويقية وإدارة الحملات وصناعة المحتوى بالذكاء الاصطناعي
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center gap-3">
+          <button
+            id="tour-marketing-new-campaign"
+            onClick={() => setIsCreateCampaignOpen(true)}
+            className="flex items-center gap-2 rounded-lg bg-navy text-white px-5 py-2.5 text-xs font-semibold hover:bg-navy/90 transition-colors shadow-sm"
+          >
+            <Plus className="size-4" />
+            <span>{t('حملة جديدة', 'New Campaign')}</span>
+          </button>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => setIsCreateCampaignOpen(true)}
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#C4A35A] to-[#B08D46] text-[#1C2B48] px-5 py-3 text-xs font-extrabold hover:brightness-110 transition-all cursor-pointer shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Plus className="size-4 stroke-[3]" />
-              <span>حملة إعلانية جديدة</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('studio')}
-              className="flex items-center gap-2 rounded-2xl bg-white/10 hover:bg-white/20 text-white px-5 py-3 text-xs font-bold border border-white/15 backdrop-blur-md transition-all cursor-pointer"
-            >
-              <Wand2 className="size-4 text-[#C4A35A]" />
-              <span>استوديو AI المباشر</span>
-            </button>
-          </div>
+          <button
+            id="tour-marketing-ai-studio-btn"
+            onClick={() => setActiveTab('studio')}
+            className="flex items-center gap-2 rounded-lg bg-surface hover:bg-surface/70 text-ink px-5 py-2.5 text-xs font-semibold border border-border transition-colors shadow-sm"
+          >
+            <Sparkles className="size-4 text-navy" />
+            <span>{t('استوديو AI', 'AI Studio')}</span>
+          </button>
         </div>
       </div>
 
-      {/* Luxury Tabs Navigation Bar */}
-      <div className="flex items-center gap-2 overflow-x-auto p-2 bg-white/80 backdrop-blur-md rounded-2xl border border-[#C4D8E5]/70 shadow-xs scrollbar-thin">
+      {/* Professional Tabs */}
+      <div id="tour-marketing-tabs" className="flex items-center gap-6 overflow-x-auto border-b border-border/60 scrollbar-none">
         {[
-          { id: 'overview', label: 'نظرة عامة', icon: BarChart3 },
-          { id: 'campaigns', label: 'الحملات ومولد AI', icon: Target },
-          { id: 'studio', label: 'استوديو الذكاء الاصطناعي', icon: Sparkles },
-          { id: 'brand', label: 'هوية العلامة التجارية', icon: Palette },
-          { id: 'content', label: 'النشر وجدولة المحتوى', icon: Calendar },
-          { id: 'leads', label: 'العملاء والتحويلات', icon: Users },
-          { id: 'connections', label: 'الحسابات والمنصات', icon: Link2 },
-          { id: 'assistant', label: 'المساعد والتوصيات', icon: Bot },
-          { id: 'settings', label: 'إعدادات AI والتدقيق', icon: Settings },
+          { id: 'overview', label: 'نظرة عامة' },
+          { id: 'campaigns', label: 'الحملات ومولد AI' },
+          { id: 'studio', label: 'استوديو الذكاء الاصطناعي' },
+          { id: 'brand', label: 'هوية العلامة التجارية' },
+          { id: 'content', label: 'جدولة المحتوى' },
+          { id: 'leads', label: 'العملاء والتحويلات' },
+          { id: 'connections', label: 'الحسابات والمنصات' },
+          { id: 'assistant', label: 'المساعد والتوصيات' },
+          { id: 'settings', label: 'الإعدادات' },
         ].map((tab) => {
-          const Icon = tab.icon
           const active = activeTab === tab.id
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+              className={`pb-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 relative -mb-[1px] ${
                 active
-                  ? 'bg-[#1C2B48] text-white shadow-md font-extrabold border border-[#8EB1D1]/40'
-                  : 'text-[#527094] hover:bg-[#E8ECEF] hover:text-[#1C2B48]'
+                  ? 'border-navy text-navy'
+                  : 'border-transparent text-ink-muted hover:text-ink hover:border-border'
               }`}
             >
-              <Icon className={`size-4 ${active ? 'text-[#C4A35A]' : 'text-[#527094]'}`} />
-              <span>{tab.label}</span>
+              {tab.label}
             </button>
           )
         })}
@@ -275,162 +266,165 @@ function OverviewModule({
 
   return (
     <div className="space-y-6">
-      {/* Metric Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <Card className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-xs hover:shadow-md transition-all space-y-3">
+      {/* Metric Cards Grid - Formal Enterprise Style */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div id="tour-marketing-stat-spend" className="p-5 bg-white border border-border rounded-xl shadow-sm flex flex-col justify-between h-32">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#527094]">إجمالي الإنفاق الإعلاني</span>
-            <div className="size-11 rounded-2xl bg-[#E8ECEF] text-[#1C2B48] flex items-center justify-center font-bold text-xs shadow-2xs">
-              SAR
-            </div>
+            <span className="text-xs font-bold text-ink-muted">إجمالي الإنفاق الإعلاني</span>
+            <DollarSign className="size-4 text-ink-muted" />
           </div>
           <div>
-            <h3 className="font-amiri text-3xl font-bold text-[#1C2B48] font-mono">
+            <h3 className="text-2xl font-black text-ink font-mono mb-1">
               {stats?.totalSpend?.toLocaleString() || 0} ر.س
             </h3>
-            <p className="text-[11px] font-bold text-emerald-600 mt-1">▲ أداء حقيقي مباشر</p>
+            <p className="text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
+              <TrendingUp className="size-3" />
+              أداء حقيقي مباشر
+            </p>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-xs hover:shadow-md transition-all space-y-3">
+        <div className="p-5 bg-white border border-border rounded-xl shadow-sm flex flex-col justify-between h-32">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#527094]">العملاء المحتملون (Leads)</span>
-            <div className="size-11 rounded-2xl bg-[#E8ECEF] text-[#1C2B48] flex items-center justify-center">
-              <Users className="size-5 text-[#8EB1D1]" />
-            </div>
+            <span className="text-xs font-bold text-ink-muted">العملاء المحتملون (Leads)</span>
+            <Users className="size-4 text-ink-muted" />
           </div>
           <div>
-            <h3 className="font-amiri text-3xl font-bold text-[#1C2B48] font-mono">
+            <h3 className="text-2xl font-black text-ink font-mono mb-1">
               {stats?.totalLeads || 0} عميل
             </h3>
-            <p className="text-[11px] font-bold text-[#8EB1D1] mt-1">
+            <p className="text-[10px] font-semibold text-navy flex items-center gap-1">
+              <BarChart3 className="size-3" />
               معدل التحويل: {stats?.conversionRate?.toFixed(1) || 0}%
             </p>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-xs hover:shadow-md transition-all space-y-3">
+        <div className="p-5 bg-white border border-border rounded-xl shadow-sm flex flex-col justify-between h-32">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#527094]">تكلفة العميل المحتمل (CPL)</span>
-            <div className="size-11 rounded-2xl bg-[#E8ECEF] text-[#1C2B48] flex items-center justify-center">
-              <Target className="size-5 text-[#8EB1D1]" />
-            </div>
+            <span className="text-xs font-bold text-ink-muted">تكلفة العميل المحتمل (CPL)</span>
+            <Target className="size-4 text-ink-muted" />
           </div>
           <div>
-            <h3 className="font-amiri text-3xl font-bold text-[#1C2B48] font-mono">
+            <h3 className="text-2xl font-black text-ink font-mono mb-1">
               {Math.round(stats?.cpl || 0)} ر.س
             </h3>
-            <p className="text-[11px] font-bold text-emerald-600 mt-1">CPA: {Math.round(stats?.cpa || 0)} ر.س</p>
+            <p className="text-[10px] font-semibold text-emerald-600">
+              CPA: {Math.round(stats?.cpa || 0)} ر.س
+            </p>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-xs hover:shadow-md transition-all space-y-3">
+        <div className="p-5 bg-white border border-border rounded-xl shadow-sm flex flex-col justify-between h-32">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#527094]">عائد الاستثمار ROAS</span>
-            <div className="size-11 rounded-2xl bg-[#1C2B48] text-[#C4A35A] flex items-center justify-center shadow-md">
-              <TrendingUp className="size-5" />
-            </div>
+            <span className="text-xs font-bold text-ink-muted">عائد الاستثمار ROAS</span>
+            <PieChartIcon className="size-4 text-ink-muted" />
           </div>
           <div>
-            <h3 className="font-amiri text-3xl font-bold text-[#1C2B48] font-mono">
+            <h3 className="text-2xl font-black text-ink font-mono mb-1">
               {stats?.roas ? `${stats.roas.toFixed(1)}x` : '0x'}
             </h3>
-            <p className="text-[11px] font-bold text-amber-600 mt-1">العوائد: {stats?.revenue?.toLocaleString() || 0} ر.س</p>
+            <p className="text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
+              <TrendingUp className="size-3" />
+              العوائد: {stats?.revenue?.toLocaleString() || 0} ر.س
+            </p>
           </div>
-        </Card>
+        </div>
       </div>
 
-      {/* Highlights */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <Card className="p-6 bg-emerald-50/70 border border-emerald-200 rounded-3xl space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-              <CheckCircle2 className="size-4 text-emerald-600" /> أفضل حملة أداءً
-            </span>
-            <span className="text-[10px] font-bold bg-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full">
-              أقل CPL
-            </span>
+      {/* Highlights - Official Alert Style */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex gap-3">
+          <div className="shrink-0 mt-0.5"><CheckCircle2 className="size-4 text-emerald-600" /></div>
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wide">أفضل حملة أداءً</span>
+              <span className="text-[9px] font-bold bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded-sm">أقل CPL</span>
+            </div>
+            <h4 className="font-bold text-sm text-emerald-950 mb-2 truncate">
+              {stats?.bestCampaign?.name || 'لا توجد حملات حقيقية كافية'}
+            </h4>
+            <div className="flex items-center gap-3 text-xs text-emerald-800 font-mono">
+              <span>الإنفاق: {stats?.bestCampaign?.spend || 0} ر.س</span>
+              <span className="w-px h-3 bg-emerald-300" />
+              <span>Leads: {stats?.bestCampaign?.leads || 0}</span>
+            </div>
           </div>
-          <h4 className="font-bold text-sm text-emerald-950 truncate">
-            {stats?.bestCampaign?.name || 'لا توجد حملات حقيقية كافية بعد'}
-          </h4>
-          <div className="flex items-center justify-between text-xs text-emerald-800 pt-2 border-t border-emerald-200/80 font-mono">
-            <span>الإنفاق: {stats?.bestCampaign?.spend || 0} ر.س</span>
-            <span>Leads: {stats?.bestCampaign?.leads || 0}</span>
-          </div>
-        </Card>
+        </div>
 
-        <Card className="p-6 bg-blue-50/70 border border-blue-200 rounded-3xl space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
-              <Sparkles className="size-4 text-blue-600" /> أفضل منصة إعلانية
-            </span>
-            <span className="text-[10px] font-bold bg-blue-200 text-blue-900 px-2.5 py-0.5 rounded-full">
-              أعلى تحويلات
-            </span>
+        <div className="p-4 bg-sky-50 border border-sky-200 rounded-xl flex gap-3">
+          <div className="shrink-0 mt-0.5"><Sparkles className="size-4 text-sky-600" /></div>
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] font-bold text-sky-800 uppercase tracking-wide">أفضل منصة إعلانية</span>
+              <span className="text-[9px] font-bold bg-sky-200 text-sky-900 px-1.5 py-0.5 rounded-sm">أعلى تحويل</span>
+            </div>
+            <h4 className="font-bold text-sm text-sky-950 mb-2">
+              {stats?.bestPlatform ? PLATFORM_INFO[stats.bestPlatform as PlatformId]?.name : 'Meta Ads'}
+            </h4>
+            <p className="text-[10px] font-medium text-sky-800 leading-tight">
+              تتميز بمعدل وصول مرتفع وتكلفة استجابة متزنة في قطاع المحاماة.
+            </p>
           </div>
-          <h4 className="font-bold text-sm text-blue-950">
-            {stats?.bestPlatform ? PLATFORM_INFO[stats.bestPlatform as PlatformId]?.name : 'Meta Ads'}
-          </h4>
-          <p className="text-xs text-blue-800 pt-2 border-t border-blue-200/80">
-            تتميز بمعدل وصول مرتفع وتكلفة استجابة متزنة.
-          </p>
-        </Card>
+        </div>
 
-        <Card className="p-6 bg-amber-50/70 border border-amber-200 rounded-3xl space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
-              <AlertTriangle className="size-4 text-amber-600" /> تنبيه تحسين AI
-            </span>
-            <button onClick={() => onNavigate('assistant')} className="text-[10px] font-bold text-amber-900 underline">
-              عرض التفاصيل
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex gap-3">
+          <div className="shrink-0 mt-0.5"><AlertTriangle className="size-4 text-amber-600" /></div>
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wide">تنبيه تحسين AI</span>
+            </div>
+            <p className="font-medium text-[11px] text-amber-950 leading-relaxed mb-2 line-clamp-2">
+              {insights[0]?.text || 'تأكد من تزويد مفاتيح API الخاصة بالذكاء الاصطناعي لبدء المزامنة.'}
+            </p>
+            <button onClick={() => onNavigate('assistant')} className="text-[10px] font-bold text-navy hover:underline">
+              عرض التفاصيل والتحليل الكامل ←
             </button>
           </div>
-          <p className="font-bold text-xs text-amber-950 leading-relaxed">
-            {insights[0]?.text || 'تأكد من تزويد مفاتيح API الخاصة بالذكاء الاصطناعي والمنصات لبدء المزامنة الحية.'}
-          </p>
-        </Card>
+        </div>
       </div>
 
-      {/* Chart */}
-      <Card className="p-6 sm:p-8 bg-white border border-[#C4D8E5] rounded-3xl shadow-xs space-y-6">
-        <div className="flex items-center justify-between border-b border-[#C4D8E5]/70 pb-4">
+      {/* Chart - Professional clean design */}
+      <div className="bg-white border border-border rounded-xl shadow-sm p-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
           <div>
-            <h3 className="font-amiri text-xl font-bold text-[#1C2B48]">
+            <h3 className="text-sm font-bold text-ink">
               مقارنة الإنفاق والعملاء المحتملين بحسب الحملة
             </h3>
-            <p className="text-xs text-[#527094]">تحليل الأداء المباشر لجميع الحملات الإعلانية</p>
+            <p className="text-[11px] text-ink-muted">تحليل الأداء المباشر للربع الحالي</p>
           </div>
           <button
             onClick={() => onNavigate('campaigns')}
-            className="text-xs font-bold text-[#1C2B48] bg-[#E8ECEF] hover:bg-[#C4D8E5] px-4 py-2 rounded-full transition-all"
+            className="mt-3 sm:mt-0 text-[11px] font-bold text-navy bg-surface hover:bg-surface/70 border border-border px-3 py-1.5 rounded-md transition-colors"
           >
-            إدارة الحملات ←
+            إدارة الحملات بالتفصيل
           </button>
         </div>
 
-        <div className="h-72 w-full font-tajawal">
+        <div className="h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECEF" />
-              <XAxis dataKey="name" stroke="#527094" fontSize={11} tick={{ fontWeight: 'bold' }} />
-              <YAxis stroke="#527094" fontSize={11} tick={{ fontWeight: 'bold' }} />
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+              <XAxis dataKey="name" stroke="#64748B" fontSize={10} tickLine={false} axisLine={false} />
+              <YAxis yAxisId="left" stroke="#64748B" fontSize={10} tickLine={false} axisLine={false} />
+              <YAxis yAxisId="right" orientation="right" stroke="#64748B" fontSize={10} tickLine={false} axisLine={false} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#1C2B48',
-                  borderColor: '#8EB1D1',
-                  borderRadius: '16px',
-                  color: '#ffffff',
-                  fontFamily: 'Tajawal'
+                  backgroundColor: '#ffffff',
+                  borderColor: '#E2E8F0',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
                 }}
               />
-              <Legend wrapperStyle={{ paddingTop: '10px', fontFamily: 'Tajawal', fontWeight: 'bold', fontSize: '12px' }} />
-              <Bar dataKey="spend" name="الإنفاق (ر.س)" fill="#1C2B48" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="leads" name="العملاء المحتملون (Leads)" fill="#8EB1D1" radius={[8, 8, 0, 0]} />
+              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+              <Bar yAxisId="left" dataKey="spend" name="الإنفاق (ر.س)" fill="#0f172a" radius={[4, 4, 0, 0]} maxBarSize={40} />
+              <Bar yAxisId="right" dataKey="leads" name="العملاء (Leads)" fill="#cbd5e1" radius={[4, 4, 0, 0]} maxBarSize={40} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }

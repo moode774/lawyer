@@ -75,7 +75,7 @@ export default function LeadDetailPage() {
         description={`المرجع: ${lead.ref} • المصدر: ${lead.source}`}
         action={
           <div className="flex items-center gap-3">
-            <Button onClick={handleConvert} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2">
+            <Button id="tour-lead-convert" onClick={handleConvert} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2">
               <UserCheck className="size-4" />
               <span>{t('تحويل إلى عميل مكتسب', 'Convert to Client')}</span>
             </Button>
@@ -88,7 +88,7 @@ export default function LeadDetailPage() {
         {/* Left Column: Lead Info */}
         <div className="lg:col-span-8 space-y-6">
           
-          <Card className="p-6 bg-white border-border space-y-6">
+          <Card id="tour-lead-overview" className="p-6 bg-white border-border space-y-6">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <h3 className="font-bold text-ink text-base">{t('تفاصيل الطلب والاستشارة', 'Lead Overview')}</h3>
               <StatusBadge status={lead.status} />
@@ -130,7 +130,7 @@ export default function LeadDetailPage() {
           </Card>
 
           {/* Timeline & Notes */}
-          <Card className="p-6 bg-white border-border space-y-6">
+          <Card id="tour-lead-timeline" className="p-6 bg-white border-border space-y-6">
             <h3 className="font-bold text-ink text-base border-b border-border pb-3">
               {t('سجل الملاحظات والأنشطة', 'Activity Timeline & Notes')}
             </h3>
@@ -166,7 +166,7 @@ export default function LeadDetailPage() {
 
         {/* Right Panel: UTM & Marketing Attribution */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="p-6 bg-surface border-border space-y-6">
+          <Card id="tour-lead-utm" className="p-6 bg-surface border-border space-y-6">
             <h3 className="font-bold text-ink text-base border-b border-border pb-3">
               {t('إسناد التسويق UTM Attribution', 'Marketing Attribution')}
             </h3>

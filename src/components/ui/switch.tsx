@@ -1,6 +1,7 @@
 import { cn } from '../../lib/utils'
 
 interface SwitchProps {
+  id?: string
   checked: boolean
   onChange?: (v: boolean) => void
   onCheckedChange?: (v: boolean) => void
@@ -8,7 +9,7 @@ interface SwitchProps {
   disabled?: boolean
 }
 
-export function Switch({ checked, onChange, onCheckedChange, label, disabled }: SwitchProps) {
+export function Switch({ id, checked, onChange, onCheckedChange, label, disabled }: SwitchProps) {
   const handleClick = () => {
     const next = !checked
     if (onChange) onChange(next)
@@ -17,6 +18,7 @@ export function Switch({ checked, onChange, onCheckedChange, label, disabled }: 
 
   return (
     <button
+      id={id}
       type="button"
       role="switch"
       aria-checked={checked}

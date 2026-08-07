@@ -260,10 +260,10 @@ export default function FinancePage() {
                 <Scale className="size-4" /> التقارير والإقرار
               </Button>
             </Link>
-            <Button size="sm" variant="outline" onClick={() => openCreate('income')} className="gap-1.5 border-success/40 text-success hover:bg-success-soft">
+            <Button id="tour-finance-add-income" size="sm" variant="outline" onClick={() => openCreate('income')} className="gap-1.5 border-success/40 text-success hover:bg-success-soft">
               <ArrowUpCircle className="size-4" /> إيراد جديد
             </Button>
-            <Button size="sm" onClick={() => openCreate('expense')} className="gap-1.5 bg-navy text-white hover:bg-navy-800">
+            <Button id="tour-finance-add-expense" size="sm" onClick={() => openCreate('expense')} className="gap-1.5 bg-navy text-white hover:bg-navy-800">
               <Plus className="size-4" /> مصروف جديد
             </Button>
           </div>
@@ -271,7 +271,7 @@ export default function FinancePage() {
       />
 
       {/* ملخص المعروض */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div id="tour-finance-summary" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label={month ? `إيرادات ${monthLabel(month)}` : 'إجمالي الإيرادات'} value={formatSAR(summary.income)} icon={<ArrowUpCircle className="size-5" />} />
         <MetricCard label={month ? `مصروفات ${monthLabel(month)}` : 'إجمالي المصروفات'} value={formatSAR(summary.expense)} icon={<ArrowDownCircle className="size-5" />} />
         <MetricCard label="الصافي" value={formatSAR(summary.net)} icon={<Scale className="size-5" />} trend={summary.net >= 0 ? 'up' : 'down'} hint={summary.net >= 0 ? 'فائض' : 'عجز'} />
@@ -339,7 +339,7 @@ export default function FinancePage() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-ink-muted">{visible.length} من {records.length} قيدًا</span>
-            <Button size="sm" variant="outline" onClick={exportCsv} disabled={visible.length === 0} className="gap-1.5 border-navy/30 text-navy">
+            <Button id="tour-finance-export" size="sm" variant="outline" onClick={exportCsv} disabled={visible.length === 0} className="gap-1.5 border-navy/30 text-navy">
               <Download className="size-3.5" /> تصدير CSV
             </Button>
           </div>
@@ -347,6 +347,7 @@ export default function FinancePage() {
       </Card>
 
       {/* الجدول */}
+      <div id="tour-finance-table">
       {isLoading ? (
         <div className="space-y-3">
           <Skeleton className="h-14 w-full" />
@@ -455,6 +456,7 @@ export default function FinancePage() {
           </div>
         </Card>
       )}
+      </div>
 
       {/* إضافة / تعديل قيد */}
       <Dialog

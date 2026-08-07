@@ -38,6 +38,7 @@ export function Tabs({ tabs, active: controlledActive, onChange, className }: Ta
         {tabs.map((t) => (
           <button
             key={t.id}
+            id={`tour-tab-${t.id}`}
             role="tab"
             type="button"
             aria-selected={activeId === t.id}

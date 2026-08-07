@@ -13,7 +13,9 @@ export const brand = {
   lawyerNameAr: 'أحمد بن عبد الحفيظ بن عبد الرحمن بن نوح',
   lawyerNameEn: 'AHMED ABDULHAFITH ABDULRAHMAN NOUH',
   licenseNumber: '4210',
-  nationalId: '1067002293',
+  // ملاحظة: رقم الهوية الوطنية الشخصي للمالك لا يوضع هنا إطلاقًا —
+  // كل ما في هذا الملف يُشحن داخل حزمة الموقع ويقرأه أي زائر.
+  // البيانات النظامية العلنية هي رقم الترخيص ورقم الهوية الاعتبارية فقط.
   legalEntityId: '7050561203',
   activityCode: '691010',
   phone: '+966500424282',

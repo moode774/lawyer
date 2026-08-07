@@ -42,7 +42,7 @@ export default function ClientDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Main Content (Matters & Documents Tabs) */}
-        <div className="lg:col-span-8 space-y-6">
+        <div id="tour-client-tabs" className="lg:col-span-8 space-y-6">
           <Tabs
             tabs={[
               {
@@ -91,7 +91,7 @@ export default function ClientDetailPage() {
 
         {/* Right Info Box */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="p-6 bg-surface border-border space-y-4 text-xs">
+          <Card id="tour-client-contact" className="p-6 bg-surface border-border space-y-4 text-xs">
             <h3 className="font-bold text-ink text-sm border-b border-border pb-2">{t('بيانات الاتصال', 'Contact Information')}</h3>
             <div>
               <span className="text-ink-muted block">{t('الجوال:', 'Phone:')}</span>

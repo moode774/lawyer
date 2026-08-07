@@ -145,23 +145,24 @@ export default function DebtsPage() {
             <Link to="/admin/finance">
               <Button size="sm" variant="outline" className="gap-1.5 border-navy/30 text-navy"><Wallet className="size-4" /> السجل المالي</Button>
             </Link>
-            <Button size="sm" variant="outline" onClick={() => openCreate('payable')} className="gap-1.5 border-navy/30 text-navy">
+            <Button id="tour-debts-new-payable" size="sm" variant="outline" onClick={() => openCreate('payable')} className="gap-1.5 border-navy/30 text-navy">
               <ArrowDownCircle className="size-4" /> التزام علينا
             </Button>
-            <Button size="sm" onClick={() => openCreate('receivable')} className="gap-1.5 bg-navy text-white hover:bg-navy-800">
+            <Button id="tour-debts-new-receivable" size="sm" onClick={() => openCreate('receivable')} className="gap-1.5 bg-navy text-white hover:bg-navy-800">
               <Plus className="size-4" /> مستحق لنا
             </Button>
           </div>
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div id="tour-debts-metrics" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="متبقٍ لنا عند الغير" value={formatSAR(stats.recRemaining)} icon={<ArrowUpCircle className="size-5" />} />
         <MetricCard label="متبقٍ علينا للغير" value={formatSAR(stats.payRemaining)} icon={<ArrowDownCircle className="size-5" />} />
         <MetricCard label="صافي المركز" value={formatSAR(stats.recRemaining - stats.payRemaining)} icon={<Scale className="size-5" />} trend={stats.recRemaining - stats.payRemaining >= 0 ? 'up' : 'down'} />
         <MetricCard label="ذمم متأخرة" value={stats.overdue} icon={<AlertTriangle className="size-5" />} hint={stats.overdue > 0 ? 'تجاوزت تاريخ الاستحقاق' : 'لا تأخير'} />
       </div>
 
+      <div id="tour-debts-lists">
       {isLoading ? (
         <div className="grid gap-4 lg:grid-cols-2"><Skeleton className="h-64 w-full" /><Skeleton className="h-64 w-full" /></div>
       ) : error ? (
@@ -174,6 +175,7 @@ export default function DebtsPage() {
           <DebtColumn direction="payable" />
         </div>
       )}
+      </div>
 
       {/* تسجيل ذمة */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} title={form.direction === 'receivable' ? 'تسجيل مستحق لنا' : 'تسجيل التزام علينا'} wide>

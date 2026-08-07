@@ -77,7 +77,7 @@ export default function DashboardPage() {
 
           {/* Left Side (RTL): Action Button */}
           <div className="flex items-center gap-5 shrink-0">
-            <Link to="/admin/matters">
+            <Link to="/admin/matters" id="tour-step-add-new">
               <Button className="bg-[#1C2B48] hover:bg-[#283d63] text-white font-bold px-7 py-3.5 rounded-full shadow-lg flex items-center gap-2 text-sm transition-all cursor-pointer border border-[#8EB1D1]/30">
                 <Plus className="size-4" />
                 <span>إضافة قضية جديدة</span>
@@ -92,7 +92,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
         {/* Card 1 */}
-        <Card className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-2xs space-y-4 hover:shadow-md transition-all">
+        <Card id="tour-dashboard-stats" className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-2xs space-y-4 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#527094]">الطلبات الجديدة (هذا الشهر)</span>
             <div className="size-11 rounded-2xl bg-[#E8ECEF] text-[#1C2B48] flex items-center justify-center">
@@ -108,7 +108,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 2 */}
-        <Card className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-2xs space-y-4 hover:shadow-md transition-all">
+        <Card id="tour-dashboard-completed-stats" className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-2xs space-y-4 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#527094]">الاستشارات المكتملة</span>
             <div className="size-11 rounded-2xl bg-[#E8ECEF] text-[#1C2B48] flex items-center justify-center">
@@ -124,7 +124,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 3 */}
-        <Card className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-2xs space-y-4 hover:shadow-md transition-all">
+        <Card id="tour-dashboard-active-stats" className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-2xs space-y-4 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#527094]">القضايا والملفات النشطة</span>
             <div className="size-11 rounded-2xl bg-[#E8ECEF] text-[#1C2B48] flex items-center justify-center">
@@ -140,7 +140,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 4 */}
-        <Card className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-2xs space-y-4 hover:shadow-md transition-all">
+        <Card id="tour-dashboard-conv-stats" className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-2xs space-y-4 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#527094]">معدل تحويل الاستشارات</span>
             <div className="size-11 rounded-2xl bg-[#E8ECEF] text-[#1C2B48] flex items-center justify-center">
@@ -161,7 +161,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Appointments Column */}
-        <div className="lg:col-span-7">
+        <div id="tour-dashboard-appointments" className="lg:col-span-7">
           <Card className="p-6 space-y-5 bg-white border border-[#C4D8E5] rounded-3xl shadow-sm">
             <div className="flex items-center justify-between border-b border-[#C4D8E5]/70 pb-4">
               <div className="flex items-center gap-2.5">
@@ -206,7 +206,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Urgent Tasks Column */}
-        <div className="lg:col-span-5">
+        <div id="tour-dashboard-tasks" className="lg:col-span-5">
           <Card className="p-6 space-y-5 bg-white border border-[#C4D8E5] rounded-3xl shadow-sm">
             <div className="flex items-center justify-between border-b border-[#C4D8E5]/70 pb-4">
               <h3 className="font-amiri text-xl font-bold text-[#1C2B48]">المهام العاجلة والمتابعات</h3>
@@ -257,7 +257,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Latest Leads Column */}
-        <div className="lg:col-span-7">
+        <div id="tour-dashboard-leads" className="lg:col-span-7">
           <Card className="p-6 space-y-5 bg-white border border-[#C4D8E5] rounded-3xl shadow-sm">
             <div className="flex items-center justify-between border-b border-[#C4D8E5]/70 pb-4">
               <div className="flex items-center gap-2.5">
@@ -300,7 +300,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Real-time Activity Feed Column */}
-        <div className="lg:col-span-5">
+        <div id="tour-dashboard-activity" className="lg:col-span-5">
           <Card className="p-6 space-y-5 bg-white border border-[#C4D8E5] rounded-3xl shadow-sm">
             <div className="flex items-center justify-between border-b border-[#C4D8E5]/70 pb-4">
               <h3 className="font-amiri text-xl font-bold text-[#1C2B48]">سجل النشاط المباشر</h3>

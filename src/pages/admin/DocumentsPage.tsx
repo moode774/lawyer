@@ -26,7 +26,7 @@ export default function DocumentsPage() {
         title={t('المخزن الأمني للمستندات والوثائق', 'Document Management System')}
         description={t('تخزين وتصنيف العقود والصحائف واللوائح بتشفير تام وصلاحيات وصول موثقة', 'Encrypted file storage & access management')}
         action={
-          <Button className="bg-navy text-white hover:bg-navy-light gap-2">
+          <Button id="tour-library-upload" className="bg-navy text-white hover:bg-navy-light gap-2">
             <Upload className="size-4" />
             <span>{t('رفع مستند جديد', 'Upload Document')}</span>
           </Button>

@@ -9,6 +9,7 @@ import PublicLayout from './layouts/PublicLayout'
 import AdminLayout from './layouts/AdminLayout'
 import PortalLayout from './layouts/PortalLayout'
 import { Skeleton } from './components/ui/skeleton'
+import { TourProvider } from './components/ui/premium-tour'
 
 // Public
 const HomePage = lazy(() => import('./pages/public/HomePage'))
@@ -85,73 +86,75 @@ export default function App() {
           <AuthProvider>
             <ToastProvider>
               <BrowserRouter>
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    {/* الموقع العام */}
-                    <Route element={<PublicLayout />}>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/about" element={<AboutPage />} />
-                      <Route path="/services" element={<ServicesPage />} />
-                      <Route path="/services/:slug" element={<ServiceDetailPage />} />
-                      <Route path="/lawyer" element={<Navigate to="/about" replace />} />
-                      <Route path="/insights" element={<InsightsPage />} />
-                      <Route path="/insights/:slug" element={<ArticlePage />} />
-                      <Route path="/faq" element={<FaqPage />} />
-                      <Route path="/contact" element={<ContactPage />} />
-                      <Route path="/privacy" element={<PrivacyPage />} />
-                      <Route path="/terms" element={<TermsPage />} />
-                    </Route>
+                <TourProvider>
+                  <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                      {/* الموقع العام */}
+                      <Route element={<PublicLayout />}>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/about" element={<AboutPage />} />
+                        <Route path="/services" element={<ServicesPage />} />
+                        <Route path="/services/:slug" element={<ServiceDetailPage />} />
+                        <Route path="/lawyer" element={<Navigate to="/about" replace />} />
+                        <Route path="/insights" element={<InsightsPage />} />
+                        <Route path="/insights/:slug" element={<ArticlePage />} />
+                        <Route path="/faq" element={<FaqPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
+                        <Route path="/privacy" element={<PrivacyPage />} />
+                        <Route path="/terms" element={<TermsPage />} />
+                      </Route>
 
-                    <Route path="/book" element={<BookPage />} />
-                    <Route path="/legal-intake" element={<IntakePage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/admin-login" element={<AdminLoginPage />} />
-                    <Route path="/register" element={<Navigate to="/login" replace />} />
-                    <Route path="/client-register" element={<Navigate to="/login" replace />} />
+                      <Route path="/book" element={<BookPage />} />
+                      <Route path="/legal-intake" element={<IntakePage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/admin-login" element={<AdminLoginPage />} />
+                      <Route path="/register" element={<Navigate to="/login" replace />} />
+                      <Route path="/client-register" element={<Navigate to="/login" replace />} />
 
-                    {/* لوحة الإدارة */}
-                    <Route path="/admin" element={<AdminLayout />}>
-                      <Route index element={<DashboardPage />} />
-                      <Route path="pipeline" element={<PipelinePage />} />
-                      <Route path="leads" element={<LeadsPage />} />
-                      <Route path="leads/:id" element={<LeadDetailPage />} />
-                      <Route path="bookings" element={<BookingsPage />} />
-                      <Route path="clients" element={<ClientsPage />} />
-                      <Route path="clients/:id" element={<ClientDetailPage />} />
-                      <Route path="matters" element={<MattersPage />} />
-                      <Route path="matters/:id" element={<MatterDetailPage />} />
-                      <Route path="tasks" element={<TasksPage />} />
-                      <Route path="documents" element={<DocumentsPage />} />
-                      <Route path="finance" element={<FinancePage />} />
-                      <Route path="finance/reports" element={<FinanceReportsPage />} />
-                      <Route path="finance/debts" element={<DebtsPage />} />
-                      <Route path="finance/invoices" element={<InvoicesPage />} />
-                      <Route path="finance/banking" element={<BankingPage />} />
-                      <Route path="analytics" element={<AnalyticsPage />} />
-                      <Route path="ai" element={<AiPage />} />
-                      <Route path="marketing" element={<MarketingPage />} />
-                      <Route path="settings" element={<SettingsPage />} />
-                      <Route path="settings/office" element={<OfficeSettingsPage />} />
-                    </Route>
+                      {/* لوحة الإدارة */}
+                      <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<DashboardPage />} />
+                        <Route path="pipeline" element={<PipelinePage />} />
+                        <Route path="leads" element={<LeadsPage />} />
+                        <Route path="leads/:id" element={<LeadDetailPage />} />
+                        <Route path="bookings" element={<BookingsPage />} />
+                        <Route path="clients" element={<ClientsPage />} />
+                        <Route path="clients/:id" element={<ClientDetailPage />} />
+                        <Route path="matters" element={<MattersPage />} />
+                        <Route path="matters/:id" element={<MatterDetailPage />} />
+                        <Route path="tasks" element={<TasksPage />} />
+                        <Route path="documents" element={<DocumentsPage />} />
+                        <Route path="finance" element={<FinancePage />} />
+                        <Route path="finance/reports" element={<FinanceReportsPage />} />
+                        <Route path="finance/debts" element={<DebtsPage />} />
+                        <Route path="finance/invoices" element={<InvoicesPage />} />
+                        <Route path="finance/banking" element={<BankingPage />} />
+                        <Route path="analytics" element={<AnalyticsPage />} />
+                        <Route path="ai" element={<AiPage />} />
+                        <Route path="marketing" element={<MarketingPage />} />
+                        <Route path="settings" element={<SettingsPage />} />
+                        <Route path="settings/office" element={<OfficeSettingsPage />} />
+                      </Route>
 
-                    {/* بوابة العميل */}
-                    <Route path="/portal" element={<PortalLayout />}>
-                      <Route index element={<PortalHomePage />} />
-                      <Route path="matters" element={<PortalMattersPage />} />
-                      <Route path="matters/:id" element={<PortalMatterDetailPage />} />
-                      <Route path="documents" element={<PortalDocumentsPage />} />
-                      <Route path="appointments" element={<PortalAppointmentsPage />} />
-                      <Route path="messages" element={<PortalMessagesPage />} />
-                      <Route path="invoices" element={<PortalInvoicesPage />} />
-                      <Route path="profile" element={<PortalProfilePage />} />
-                    </Route>
+                      {/* بوابة العميل */}
+                      <Route path="/portal" element={<PortalLayout />}>
+                        <Route index element={<PortalHomePage />} />
+                        <Route path="matters" element={<PortalMattersPage />} />
+                        <Route path="matters/:id" element={<PortalMatterDetailPage />} />
+                        <Route path="documents" element={<PortalDocumentsPage />} />
+                        <Route path="appointments" element={<PortalAppointmentsPage />} />
+                        <Route path="messages" element={<PortalMessagesPage />} />
+                        <Route path="invoices" element={<PortalInvoicesPage />} />
+                        <Route path="profile" element={<PortalProfilePage />} />
+                      </Route>
 
-                    {/* 404 داخل التخطيط العام — لا يُعاد توجيهها للرئيسية حتى لا تُعدّ soft 404 */}
-                    <Route element={<PublicLayout />}>
-                      <Route path="*" element={<NotFoundPage />} />
-                    </Route>
-                  </Routes>
-                </Suspense>
+                      {/* 404 داخل التخطيط العام — لا يُعاد توجيهها للرئيسية حتى لا يُعدّ soft 404 */}
+                      <Route element={<PublicLayout />}>
+                        <Route path="*" element={<NotFoundPage />} />
+                      </Route>
+                    </Routes>
+                  </Suspense>
+                </TourProvider>
               </BrowserRouter>
             </ToastProvider>
           </AuthProvider>

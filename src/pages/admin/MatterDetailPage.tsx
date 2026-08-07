@@ -45,7 +45,7 @@ export default function MatterDetailPage() {
         {/* Main Details & Tabs */}
         <div className="lg:col-span-8 space-y-6">
           
-          <Card className="p-6 bg-white border-border space-y-4">
+          <Card id="tour-matter-summary" className="p-6 bg-white border-border space-y-4">
             <h3 className="font-bold text-ink text-base border-b border-border pb-3">{t('تفاصيل الموضوع والملخص', 'Summary & Description')}</h3>
             <p className="text-sm text-ink-muted leading-relaxed">{matter.description || t('لا يوجد وصف إضافي مكتوب للموضوع.', 'No description')}</p>
 
@@ -64,7 +64,8 @@ export default function MatterDetailPage() {
             )}
           </Card>
 
-          <Tabs
+          <div id="tour-matter-tabs">
+            <Tabs
             tabs={[
               {
                 id: 'tasks',
@@ -102,12 +103,13 @@ export default function MatterDetailPage() {
               }
             ]}
           />
+          </div>
 
         </div>
 
         {/* Right Panel: Client & Assigned Lawyer */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="p-6 bg-surface border-border space-y-4 text-xs">
+          <Card id="tour-matter-assignees" className="p-6 bg-surface border-border space-y-4 text-xs">
             <h3 className="font-bold text-ink text-sm border-b border-border pb-2">{t('بيانات العميل والمحامي', 'Client & Counsel')}</h3>
             <div>
               <span className="text-ink-muted block">{t('العميل المرتبط:', 'Client:')}</span>

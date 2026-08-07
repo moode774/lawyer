@@ -181,7 +181,7 @@ export default function FinanceReportsPage() {
           <div className="flex items-center gap-2">
             <Select value={String(year)} onChange={(e) => setYear(Number(e.target.value))} options={yearOptions} className="w-32" />
             <Link to="/admin/finance">
-              <Button size="sm" variant="outline" className="gap-1.5 border-navy/30 text-navy">
+              <Button id="tour-reports-ledger" size="sm" variant="outline" className="gap-1.5 border-navy/30 text-navy">
                 <Wallet className="size-4" /> سجل القيود
               </Button>
             </Link>
@@ -209,7 +209,7 @@ export default function FinanceReportsPage() {
       </div>
 
       {/* ملخص السنة */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div id="tour-reports-metrics" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label={`إيرادات ${year}`} value={formatSAR(yearSummary.income)} icon={<ArrowUpCircle className="size-5" />} />
         <MetricCard label={`مصروفات ${year}`} value={formatSAR(yearSummary.expense)} icon={<ArrowDownCircle className="size-5" />} />
         <MetricCard label="صافي السنة" value={formatSAR(yearSummary.net)} icon={<Scale className="size-5" />} trend={yearSummary.net >= 0 ? 'up' : 'down'} hint={yearSummary.net >= 0 ? 'فائض' : 'عجز'} />
@@ -302,7 +302,7 @@ export default function FinanceReportsPage() {
           ))}
 
           {/* إضافة تصنيف */}
-          <div className="mt-4 rounded-xl border border-dashed border-border p-3">
+          <div id="tour-reports-add-cat" className="mt-4 rounded-xl border border-dashed border-border p-3">
             <p className="mb-2 flex items-center gap-1.5 text-xs font-bold text-ink">
               <Plus className="size-3.5 text-navy" /> إضافة تصنيف جديد
             </p>
@@ -323,7 +323,7 @@ export default function FinanceReportsPage() {
 
         {/* الإقرار الضريبي */}
         <div className="space-y-4">
-          <Card className="border-border bg-white p-5">
+          <Card id="tour-reports-tax-calc" className="border-border bg-white p-5">
             <h3 className="mb-1 flex items-center gap-2 font-display text-base font-bold text-ink">
               <Landmark className="size-4 text-navy-500" /> حاسبة الإقرار الضريبي (ضريبة القيمة المضافة)
             </h3>

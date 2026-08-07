@@ -29,9 +29,15 @@ export default function TasksPage() {
       <PageHeader
         title={t('مهام ومتابعات العمل القانوني', 'Internal Tasks')}
         description={t('تحديد الأولويات والمواعيد النهائية لجلسات وصياغة العقود', 'Task allocation & deadlines')}
+        action={
+          <Button id="tour-tasks-add" size="sm" className="bg-navy text-white hover:bg-navy-light gap-2">
+            <Plus className="size-4" />
+            <span>{t('إضافة مهمة جديدة', 'Add Task')}</span>
+          </Button>
+        }
       />
 
-      <Card className="p-4 bg-white border-border flex items-center justify-between">
+      <Card id="tour-tasks-filter" className="p-4 bg-white border-border flex items-center justify-between">
         <div className="flex gap-2">
           <Button
             size="sm"
@@ -60,7 +66,7 @@ export default function TasksPage() {
         </div>
       </Card>
 
-      <div className="space-y-3">
+      <div id="tour-tasks-list" className="space-y-3">
         {filtered.map((task) => (
           <Card key={task.id} className="p-4 bg-white border-border flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">

@@ -70,7 +70,7 @@ export default function PipelinePage() {
         title={t('إدارة خط أنبوب العملاء CRM', 'Lead CRM Pipeline')}
         description={t('متابعة مراحل تحويل العملاء من طلب الاستفسار المبدئي إلى اكتساب العميل', 'Track lead stages from inquiry to acquisition')}
         action={
-          <Link to="/admin/leads">
+          <Link to="/admin/leads" id="tour-pipeline-list-btn">
             <Button size="sm" className="bg-navy text-white hover:bg-navy-light gap-2">
               <Plus className="size-4" />
               <span>{t('قائمة الجدول التفصيلية', 'List View')}</span>
@@ -80,7 +80,7 @@ export default function PipelinePage() {
       />
 
       {/* Filter & Search Bar */}
-      <Card className="p-4 bg-white border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+      <Card id="tour-pipeline-filter" className="p-4 bg-white border-border flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-80">
           <Search className="absolute start-3 top-2.5 size-4 text-ink-muted" />
           <Input
@@ -107,7 +107,7 @@ export default function PipelinePage() {
       </Card>
 
       {/* KANBAN BOARD BOARD GRID */}
-      <div className="flex gap-4 overflow-x-auto pb-6 pt-2 scrollbar-thin">
+      <div id="tour-pipeline-board" className="flex gap-4 overflow-x-auto pb-6 pt-2 scrollbar-thin">
         {PIPELINE_COLUMNS.map((col) => {
           const colLeads = filteredLeads.filter((l) => l.status === col.id)
           const totalVal = colLeads.reduce((acc, l) => acc + (l.estimatedValue || 0), 0)
@@ -115,6 +115,7 @@ export default function PipelinePage() {
           return (
             <div
               key={col.id}
+              id={`tour-pipeline-col-${col.id}`}
               className="w-72 sm:w-80 shrink-0 bg-surface rounded-2xl p-4 border border-border/70 flex flex-col max-h-[750px]"
             >
               {/* Column Header */}

@@ -45,7 +45,7 @@ export default function AnalyticsPage() {
       />
 
       {/* KPI METRIC CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 font-tajawal">
+      <div id="tour-analytics-kpi" className="grid grid-cols-1 sm:grid-cols-3 gap-5 font-tajawal">
         <Card className="p-6 bg-white border border-[#C4D8E5] rounded-3xl shadow-2xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#527094]">إجمالي الزوار هذا الشهر</span>
@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* CHART 1: BAR CHART (ATTRIBUTION BY CHANNEL) */}
-      <Card className="p-6 sm:p-8 bg-white border border-[#C4D8E5] rounded-3xl shadow-sm space-y-6">
+      <Card id="tour-analytics-chart-1" className="p-6 sm:p-8 bg-white border border-[#C4D8E5] rounded-3xl shadow-sm space-y-6">
         <div className="flex items-center justify-between border-b border-[#C4D8E5]/70 pb-4">
           <div className="flex items-center gap-2.5">
             <BarChart2 className="size-5 text-[#1C2B48]" />
@@ -126,7 +126,7 @@ export default function AnalyticsPage() {
       </Card>
 
       {/* CHART 2: AREA CHART (REVENUE & GROWTH TREND) */}
-      <Card className="p-6 sm:p-8 bg-white border border-[#C4D8E5] rounded-3xl shadow-sm space-y-6">
+      <Card id="tour-analytics-chart-2" className="p-6 sm:p-8 bg-white border border-[#C4D8E5] rounded-3xl shadow-sm space-y-6">
         <div className="flex items-center justify-between border-b border-[#C4D8E5]/70 pb-4">
           <div className="flex items-center gap-2.5">
             <TrendingUp className="size-5 text-[#1C2B48]" />

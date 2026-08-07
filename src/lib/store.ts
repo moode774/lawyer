@@ -15,7 +15,7 @@ import type {
 } from '../types'
 import { supabase } from './supabase'
 
-const STORAGE_KEY = 'lawyer_firm_db_clean_v2'
+const STORAGE_KEY = 'lawyer_firm_db_clean_v3'
 
 function loadLocalDb() {
   try {
@@ -23,6 +23,7 @@ function loadLocalDb() {
     localStorage.removeItem('lawyer_firm_db_v2')
     localStorage.removeItem('lawyer_firm_db_v3')
     localStorage.removeItem('lawyer_firm_db_clean_v1')
+    localStorage.removeItem('lawyer_firm_db_clean_v2')
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) return JSON.parse(raw)
   } catch (e) {

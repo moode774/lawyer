@@ -2,7 +2,8 @@ import React from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Briefcase, Calendar, FileText, CheckSquare, Scale, Clock, Lock } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { useQuery } from '@tanstack/react-query'
+import { getMatter, getClient, listDocuments, listTasks } from '../../lib/records'
 import { Matter, Doc, Task } from '../../types'
 import { Card } from '../../components/ui/card'
 import { StatusBadge } from '../../components/ui/status-badge'
@@ -15,16 +16,33 @@ export default function MatterDetailPage() {
   const { id } = useParams()
   const { t } = useT()
 
-  const matter: Matter | undefined = store.getMatter(id || '')
-  useSEO({ title: matter ? `ملف القضية | ${matter.ref}` : 'ملف القضية' })
+  const { data: matter, isLoading } = useQuery<Matter | undefined>({
+    queryKey: ['matter', id],
+    queryFn: () => getMatter(id || ''),
+    enabled: Boolean(id),
+  })
+
+  const { data: client } = useQuery({
+    queryKey: ['client', matter?.clientId],
+    queryFn: () => getClient(matter!.clientId),
+    enabled: Boolean(matter?.clientId),
+  })
+
+  const { data: allDocs = [] } = useQuery<Doc[]>({ queryKey: ['documents'], queryFn: listDocuments })
+  const { data: allTasks = [] } = useQuery<Task[]>({ queryKey: ['tasks'], queryFn: listTasks })
+
+  useSEO({ title: matter ? `ملف القضية | ${matter.ref}` : 'ملف القضية', noindex: true })
+
+  if (isLoading) {
+    return <div className="p-8 text-ink-muted">{t('جارٍ تحميل ملف القضية...', 'Loading matter...')}</div>
+  }
 
   if (!matter) {
     return <div className="p-8 text-ink-muted">{t('الملف غير موجود', 'Matter not found')}</div>
   }
 
-  const client = store.getClient(matter.clientId)
-  const docs = store.getDocuments().filter((d: Doc) => d.matterId === matter.id)
-  const tasks = store.getTasks().filter((t: Task) => t.entityId === matter.id)
+  const docs = allDocs.filter((d) => d.matterId === matter.id)
+  const tasks = allTasks.filter((task) => task.entityId === matter.id)
 
   return (
     <div className="space-y-6 pb-12">

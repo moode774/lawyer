@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Briefcase, FileText, Calendar, Plus, Phone, Mail, MapPin } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { useQuery } from '@tanstack/react-query'
+import { getClient, listMatters, listDocuments } from '../../lib/records'
 import { Client, Matter, Doc } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -16,15 +17,31 @@ export default function ClientDetailPage() {
   const { id } = useParams()
   const { t } = useT()
 
-  const client: Client | undefined = store.getClient(id || '')
-  useSEO({ title: client ? `ملف العميل | ${client.name}` : 'ملف العميل' })
+  const { data: client, isLoading } = useQuery<Client | undefined>({
+    queryKey: ['client', id],
+    queryFn: () => getClient(id || ''),
+    enabled: Boolean(id),
+  })
+
+  const { data: matters = [] } = useQuery<Matter[]>({
+    queryKey: ['matters', id],
+    queryFn: () => listMatters(id),
+    enabled: Boolean(id),
+  })
+
+  const { data: allDocs = [] } = useQuery<Doc[]>({ queryKey: ['documents'], queryFn: listDocuments })
+
+  useSEO({ title: client ? `ملف العميل | ${client.name}` : 'ملف العميل', noindex: true })
+
+  if (isLoading) {
+    return <div className="p-8 text-ink-muted">{t('جارٍ تحميل ملف العميل...', 'Loading client...')}</div>
+  }
 
   if (!client) {
     return <div className="p-8 text-ink-muted">{t('العميل غير موجود', 'Client not found')}</div>
   }
 
-  const matters: Matter[] = store.getMatters(client.id)
-  const docs = store.getDocuments().filter((d: Doc) => d.clientId === client.id)
+  const docs = allDocs.filter((d) => d.clientId === client.id)
 
   return (
     <div className="space-y-6 pb-12">

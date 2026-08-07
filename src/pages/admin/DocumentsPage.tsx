@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Plus, Search, FileText, Upload, Download, Eye, Lock, ShieldCheck } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { useQuery } from '@tanstack/react-query'
+import { listDocuments } from '../../lib/records'
 import { Doc } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -15,7 +16,7 @@ export default function DocumentsPage() {
   const { t } = useT()
   useSEO({ title: 'إدارة المستندات | ' + t('مكتب المحاماة', 'Law Firm') })
 
-  const [docs, setDocs] = useState<Doc[]>(store.getDocuments())
+  const { data: docs = [], isLoading } = useQuery<Doc[]>({ queryKey: ['documents'], queryFn: listDocuments })
   const [search, setSearch] = useState('')
 
   const filtered = docs.filter((d) => d.name.toLowerCase().includes(search.toLowerCase()) || d.category.includes(search))

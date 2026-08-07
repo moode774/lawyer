@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Search, ExternalLink } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { useQuery } from '@tanstack/react-query'
+import { listMatters } from '../../lib/records'
 import { Matter } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -16,7 +17,7 @@ export default function MattersPage() {
   const { t } = useT()
   useSEO({ title: 'القضايا والملفات القانونية | ' + t('مكتب المحاماة', 'Law Firm') })
 
-  const matters: Matter[] = store.getMatters()
+  const { data: matters = [], isLoading } = useQuery<Matter[]>({ queryKey: ['matters'], queryFn: () => listMatters() })
   const [search, setSearch] = useState('')
 
   const filtered = matters.filter((m) =>

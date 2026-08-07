@@ -20,7 +20,9 @@ import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { useSEO } from '../../lib/seo'
-import { listAppointments, listLeads, store } from '../../lib/store'
+import { listAppointments, listLeads } from '../../lib/store'
+import { listClients, listMatters, listTasks } from '../../lib/records'
+import { listRecentActivity, summarize } from '../../lib/activity'
 import type { Appointment, Client, Lead, Matter, Task, Activity } from '../../types'
 
 export default function DashboardPage() {
@@ -29,11 +31,12 @@ export default function DashboardPage() {
 
   // Live Dynamic Data Queries from Store
   const { data: leads = [] } = useQuery<Lead[]>({ queryKey: ['leads'], queryFn: listLeads })
-  const { data: clients = [] } = useQuery<Client[]>({ queryKey: ['clients'], queryFn: () => store.getClients() })
-  const { data: matters = [] } = useQuery<Matter[]>({ queryKey: ['matters'], queryFn: () => store.getMatters() })
+  const { data: clients = [] } = useQuery<Client[]>({ queryKey: ['clients'], queryFn: listClients })
+  const { data: matters = [] } = useQuery<Matter[]>({ queryKey: ['matters'], queryFn: () => listMatters() })
   const { data: appointments = [] } = useQuery<Appointment[]>({ queryKey: ['appointments'], queryFn: () => listAppointments() })
-  const { data: tasks = [] } = useQuery<Task[]>({ queryKey: ['tasks'], queryFn: () => store.getTasks() })
-  const { data: activities = [] } = useQuery<Activity[]>({ queryKey: ['activities'], queryFn: () => store.getActivities() })
+  const { data: tasks = [] } = useQuery<Task[]>({ queryKey: ['tasks'], queryFn: listTasks })
+  // النشاط من سجل التدقيق في قاعدة البيانات — يعرض عمل كل الفريق لا هذا الجهاز فقط.
+  const { data: activities = [] } = useQuery({ queryKey: ['recent-activity'], queryFn: () => listRecentActivity(8) })
 
   // Calculated Metrics
   const completedAppointmentsCount = appointments.filter((a: Appointment) => a.status === 'completed').length
@@ -313,14 +316,14 @@ export default function DashboardPage() {
                   <p className="text-xs font-bold text-[#527094]">لا يوجد نشاط حديث حتى الآن</p>
                 </div>
               ) : (
-                activities.slice(0, 4).map((act: Activity) => (
-                  <div key={act.id} className="flex items-center justify-between py-1">
-                    <div className="flex items-center gap-3">
-                      <div className="size-2.5 rounded-full bg-[#1C2B48]" />
-                      <span className="text-[#1C2B48]">{act.text}</span>
+                activities.slice(0, 4).map((act) => (
+                  <div key={act.id} className="flex items-start justify-between gap-3 py-1">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="size-2.5 rounded-full bg-[#1C2B48] shrink-0 mt-1.5" />
+                      <span className="text-[#1C2B48] leading-relaxed">{summarize(act)}</span>
                     </div>
-                    <span className="font-mono text-[#527094] text-[11px]">
-                      {act.createdAt ? new Date(act.createdAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : ''}
+                    <span className="font-mono text-[#527094] text-[11px] shrink-0">
+                      {new Date(act.createdAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                 ))

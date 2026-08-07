@@ -95,35 +95,35 @@ export interface SearchResult {
   link: string
 }
 
+/** بحث شامل عبر قاعدة البيانات — يشمل ما أدخله بقية الفريق لا هذا الجهاز فقط. */
 export async function globalSearch(q: string): Promise<SearchResult[]> {
-  await wait()
-  const term = q.trim().toLowerCase()
+  const term = q.trim()
   if (!term) return []
+  const like = `%${term}%`
+
+  const [leads, clients, matters, documents] = await Promise.all([
+    supabase.from('leads').select('id, reference_number, full_name, category')
+      .or(`full_name.ilike.${like},reference_number.ilike.${like},phone.ilike.${like}`).limit(5),
+    supabase.from('clients').select('id, reference_number, full_name')
+      .or(`full_name.ilike.${like},reference_number.ilike.${like},phone.ilike.${like}`).limit(5),
+    supabase.from('matters').select('id, reference_number, title')
+      .or(`title.ilike.${like},reference_number.ilike.${like}`).limit(5),
+    supabase.from('documents').select('id, name, category').ilike('name', like).limit(5),
+  ])
+
   const res: SearchResult[] = []
 
-  db.leads.forEach((l: Lead) => {
-    if (l.name.toLowerCase().includes(term) || l.ref.toLowerCase().includes(term) || l.phone.includes(term)) {
-      res.push({ kind: 'lead', id: l.id, title: l.name, subtitle: `طلب ${l.ref} • ${l.category}`, link: `/admin/leads/${l.id}` })
-    }
-  })
+  ;(leads.data ?? []).forEach((l) =>
+    res.push({ kind: 'lead', id: l.id, title: l.full_name, subtitle: `طلب ${l.reference_number} • ${l.category ?? ''}`, link: `/admin/leads/${l.id}` }))
 
-  db.clients.forEach((c: Client) => {
-    if (c.name.toLowerCase().includes(term) || c.ref.toLowerCase().includes(term) || c.phone.includes(term)) {
-      res.push({ kind: 'client', id: c.id, title: c.name, subtitle: `عميل ${c.ref}`, link: `/admin/clients/${c.id}` })
-    }
-  })
+  ;(clients.data ?? []).forEach((c) =>
+    res.push({ kind: 'client', id: c.id, title: c.full_name, subtitle: `عميل ${c.reference_number}`, link: `/admin/clients/${c.id}` }))
 
-  db.matters.forEach((m: any) => {
-    if (m.title.toLowerCase().includes(term) || m.ref.toLowerCase().includes(term)) {
-      res.push({ kind: 'matter', id: m.id, title: m.title, subtitle: `قضية ${m.ref}`, link: `/admin/matters/${m.id}` })
-    }
-  })
+  ;(matters.data ?? []).forEach((m) =>
+    res.push({ kind: 'matter', id: m.id, title: m.title, subtitle: `قضية ${m.reference_number}`, link: `/admin/matters/${m.id}` }))
 
-  db.documents.forEach((d: Doc) => {
-    if (d.name.toLowerCase().includes(term)) {
-      res.push({ kind: 'document', id: d.id, title: d.name, subtitle: `مستند • ${d.category}`, link: `/admin/documents` })
-    }
-  })
+  ;(documents.data ?? []).forEach((d) =>
+    res.push({ kind: 'document', id: d.id, title: d.name, subtitle: `مستند • ${d.category ?? ''}`, link: '/admin/documents' }))
 
   return res.slice(0, 10)
 }
@@ -396,161 +396,20 @@ export async function listAppointments(clientId?: string, leadId?: string): Prom
   return [...list].sort((a: Appointment, b: Appointment) => b.createdAt.localeCompare(a.createdAt))
 }
 
-// ===== Clients & Matters =====
-export async function createClientFromLead(leadId: string): Promise<{ client: Client; lead: Lead } | undefined> {
-  await wait(100)
-  const lead = db.leads.find((l: Lead) => l.id === leadId)
-  if (!lead) return undefined
+/*
+ * دوال العملاء والقضايا والمستندات القديمة (localStorage) حُذفت من هنا.
+ * البديل: lib/records.ts — يقرأ ويكتب في Supabase حصرًا.
+ */
 
-  lead.status = 'won'
-  lead.lastActivityAt = new Date().toISOString()
-
-  const client: Client = {
-    id: uid(),
-    ref: `CL-2026-0${clientSeq++}`,
-    type: lead.type,
-    name: lead.name,
-    phone: lead.phone,
-    email: lead.email || `${lead.id}@client.demo`,
-    company: lead.company,
-    portalAccess: true,
-    convertedFromLeadId: lead.id,
-    createdAt: new Date().toISOString(),
-  }
-  db.clients.unshift(client)
-  saveDb()
-
-  logActivity({ entityType: 'lead', entityId: lead.id, type: 'converted_to_client', text: `تم تحويل العميل المحتمل إلى عميل مكتسب (${client.ref})`, actor: 'أنت' })
-  logActivity({ entityType: 'client', entityId: client.id, type: 'status_changed', text: 'تم فتح ملف العميل بمركز العمليات وتفعيل بوابة العميل', actor: 'أنت' })
-
-  try {
-    supabase.from('clients').insert([{
-      reference_number: client.ref,
-      full_name: client.name,
-      client_type: client.type,
-      company_name: client.company || null,
-      phone: client.phone,
-      email: client.email
-    }]).then(({ error }) => {
-      if (error) console.warn('Supabase client sync info:', error.message)
-    })
-  } catch (err) {}
-
-  return { client, lead }
-}
-
-export async function getClient(id: string): Promise<Client | undefined> {
-  await wait()
-  return db.clients.find((c: Client) => c.id === id)
-}
-
-export async function getMatter(id: string): Promise<any | undefined> {
-  await wait()
-  return db.matters.find((m: any) => m.id === id)
-}
-
-export async function listClients(): Promise<Client[]> {
-  await wait()
-  return [...db.clients]
-}
-
-export async function listMatters(clientId?: string): Promise<any[]> {
-  await wait()
-  return clientId ? db.matters.filter((m: any) => m.clientId === clientId) : db.matters
-}
-
-export async function listDocuments(): Promise<Doc[]> {
-  await wait()
-  return [...db.documents]
-}
-
-export async function listMessages(): Promise<Message[]> {
-  await wait()
-  return [...db.messages]
-}
-
-// ===== Synchronous Store Facade =====
+/**
+ * إعدادات الأتمتة — القيم الافتراضية المعروضة في شاشة الإعدادات.
+ *
+ * ملاحظة: الواجهة المتزامنة القديمة (store) التي كانت تحفظ العملاء والقضايا
+ * والمهام والمستندات في localStorage حُذفت بالكامل. مكانها الآن lib/records.ts
+ * وكلها تقرأ وتكتب في Supabase، فتظهر البيانات على كل الأجهزة ولا تضيع بمسح
+ * ذاكرة المتصفح.
+ */
 export const store = {
-  getLeads: () => db.leads,
-  getLead: (id: string) => db.leads.find((l: Lead) => l.id === id),
-  addLead: (input: any) => {
-    const lead = {
-      id: uid(),
-      ref: 'LD-2026-0' + (leadSeq++),
-      status: 'new' as const,
-      createdAt: new Date().toISOString().slice(0, 10),
-      lastActivityAt: new Date().toISOString().slice(0, 10),
-      ...input,
-    }
-    db.leads.unshift(lead)
-    saveDb()
-    logActivity({ entityType: 'lead', entityId: lead.id, type: 'lead_created', text: 'تم إنشاء العميل المحتمل', actor: 'النظام' })
-    return lead
-  },
-  updateLeadStatus: (id: string, status: any) => {
-    const lead = db.leads.find((l: Lead) => l.id === id)
-    if (lead) {
-      lead.status = status
-      saveDb()
-      logActivity({ entityType: 'lead', entityId: id, type: 'status_changed', text: 'تغيرت الحالة إلى ' + status, actor: 'أنت' })
-    }
-    return lead
-  },
-  convertLeadToClient: (leadId: string) => {
-    const lead = db.leads.find((l: Lead) => l.id === leadId)
-    if (!lead) return undefined
-    lead.status = 'won'
-    const client = {
-      id: uid(),
-      ref: 'CL-00' + (clientSeq++),
-      type: lead.type,
-      name: lead.name,
-      phone: lead.phone,
-      email: lead.email,
-      company: lead.company,
-      portalAccess: true,
-      convertedFromLeadId: lead.id,
-      createdAt: new Date().toISOString().slice(0, 10),
-    }
-    db.clients.unshift(client)
-    saveDb()
-    return client
-  },
-  getClients: () => db.clients,
-  getClient: (id: string) => db.clients.find((c: Client) => c.id === id),
-  getMatters: (clientId?: string) => (clientId ? db.matters.filter((m: any) => m.clientId === clientId) : db.matters),
-  getMatter: (id: string) => db.matters.find((m: any) => m.id === id),
-  getAppointments: () => db.appointments,
-  addAppointment: (input: any) => {
-    const appt = {
-      id: uid(),
-      ref: 'BK-0' + (bookingSeq++),
-      status: 'confirmed' as const,
-      createdAt: new Date().toISOString().slice(0, 10),
-      ...input,
-    }
-    db.appointments.unshift(appt)
-    saveDb()
-    return appt
-  },
-  getDocuments: () => db.documents.map((d: any) => ({ ...d, uploadedAt: typeof d.uploadedAt === 'string' ? d.uploadedAt.slice(0, 10) : '2026-01-15' })),
-  getTasks: () => db.tasks,
-  getActivities: (type?: string, id?: string) => {
-    let list = db.activities
-    if (type && id) list = list.filter((a: Activity) => a.entityType === type && a.entityId === id)
-    return list.map((a: any) => ({ ...a, createdAt: typeof a.createdAt === 'string' ? a.createdAt.slice(0, 10) : 'اليوم' }))
-  },
-  addActivity: (entityType: any, entityId: string, text: string, actor = 'أنت') => {
-    logActivity({ entityType, entityId, type: 'note_added', text, actor })
-  },
-  getDashboardStats: () => ({
-    todayAppointments: db.appointments.length,
-    newLeads: db.leads.filter((l: Lead) => l.status === 'new').length,
-    activeMatters: db.matters.filter((m: any) => m.status === 'active').length,
-    urgentTasks: db.tasks.filter((t: Task) => t.priority === 'urgent' && t.status !== 'done').length,
-    consultationsBooked: db.appointments.filter((a: Appointment) => a.status === 'confirmed' || a.status === 'completed').length,
-    conversionRate: 68,
-  }),
   getAutomationSettings: () => ({
     whatsappEnabled: true,
     emailEnabled: true,
@@ -559,7 +418,5 @@ export const store = {
     leadCreatedTemplate: 'مرحبًا {name}، تم استلام طلبك لدى مكتب المحاماة. رقم الطلب: {reference}.',
     bookingConfirmedTemplate: 'تم تأكيد موعد استشارتك بنجاح في تاريخ {date} الساعة {time}.',
   }),
-  updateAutomationSettings: (newSettings: any) => {},
+  updateAutomationSettings: (_newSettings: unknown) => {},
 }
-
-

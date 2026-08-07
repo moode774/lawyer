@@ -120,6 +120,58 @@ export async function listEntityActivity(entityType: string, entityId: string, l
   }))
 }
 
+const ENTITY_LABELS: Record<string, string> = {
+  leads: 'عميل محتمل',
+  clients: 'عميل',
+  matters: 'قضية',
+  tasks: 'مهمة',
+  documents: 'مستند',
+  appointments: 'موعد',
+  invoices: 'فاتورة',
+  finance_debts: 'ذمة مالية',
+  finance_records: 'قيد مالي',
+  contact_requests: 'رسالة تواصل',
+  profiles: 'مستخدم',
+}
+
+const ACTION_LABELS: Record<ActivityEntry['action'], string> = {
+  insert: 'أضاف',
+  update: 'عدّل',
+  delete: 'حذف',
+}
+
+/** أحدث النشاط عبر النظام كله — لمركز العمليات. */
+export async function listRecentActivity(limit = 12): Promise<ActivityEntry[]> {
+  const { data, error } = await supabase
+    .from('activity_log')
+    .select('id, actor_name, actor_email, action, entity_type, entity_id, entity_label, changed_fields, old_data, new_data, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error) throw new Error(error.message)
+
+  return (data ?? []).map((row) => ({
+    id: row.id as string,
+    actorName: (row.actor_name as string) || 'غير معروف',
+    actorEmail: (row.actor_email as string) ?? null,
+    action: row.action as ActivityEntry['action'],
+    entityType: row.entity_type as string,
+    entityId: (row.entity_id as string) ?? null,
+    entityLabel: (row.entity_label as string) ?? null,
+    changedFields: (row.changed_fields as string[]) ?? null,
+    oldData: (row.old_data as Record<string, unknown>) ?? null,
+    newData: (row.new_data as Record<string, unknown>) ?? null,
+    createdAt: row.created_at as string,
+  }))
+}
+
+/** جملة عربية واحدة تصف العملية: «محمد أضاف عميل: أحمد». */
+export function summarize(entry: ActivityEntry): string {
+  const what = ENTITY_LABELS[entry.entityType] || entry.entityType
+  const who = ACTION_LABELS[entry.action]
+  return entry.entityLabel ? `${entry.actorName} ${who} ${what}: ${entry.entityLabel}` : `${entry.actorName} ${who} ${what}`
+}
+
 /** صياغة سطر عربي مقروء لكل تغيير داخل عملية تعديل. */
 export function describeChanges(entry: ActivityEntry): string[] {
   if (entry.action === 'insert') return ['أنشأ السجل']

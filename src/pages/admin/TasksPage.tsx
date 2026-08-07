@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Plus, Search, CheckSquare, Clock, AlertCircle } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { listTasks, updateTaskStatus } from '../../lib/records'
 import { Task } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -14,12 +15,20 @@ export default function TasksPage() {
   const { t } = useT()
   useSEO({ title: 'إدارة المهام | ' + t('مكتب المحاماة', 'Law Firm') })
 
-  const [tasks, setTasks] = useState<Task[]>(store.getTasks())
+  const queryClient = useQueryClient()
+  const { data: tasks = [], isLoading } = useQuery<Task[]>({ queryKey: ['tasks'], queryFn: listTasks })
   const [filter, setFilter] = useState<'all' | 'todo' | 'done'>('all')
 
+  // تغيير الحالة يُحفظ في قاعدة البيانات ثم تُعاد قراءة القائمة، فيراه بقية الفريق.
+  const toggleStatus = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: Task['status'] }) => updateTaskStatus(id, status),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+  })
+
   const toggleTask = (id: string) => {
-    const updated = tasks.map((t) => (t.id === id ? { ...t, status: t.status === 'done' ? ('todo' as const) : ('done' as const) } : t))
-    setTasks(updated)
+    const task = tasks.find((item) => item.id === id)
+    if (!task) return
+    toggleStatus.mutate({ id, status: task.status === 'done' ? 'todo' : 'done' })
   }
 
   const filtered = tasks.filter((t) => (filter === 'all' ? true : filter === 'done' ? t.status === 'done' : t.status !== 'done'))

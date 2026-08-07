@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, ExternalLink, Plus } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { useQuery } from '@tanstack/react-query'
+import { listClients } from '../../lib/records'
 import { Client } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -16,7 +17,7 @@ export default function ClientsPage() {
   const { t } = useT()
   useSEO({ title: 'قاعدة العملاء | ' + t('مكتب المحاماة', 'Law Firm') })
 
-  const clients: Client[] = store.getClients()
+  const { data: clients = [], isLoading } = useQuery<Client[]>({ queryKey: ['clients'], queryFn: listClients })
   const [search, setSearch] = useState('')
 
   const filtered = clients.filter((c) =>
@@ -63,6 +64,24 @@ export default function ClientsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={6} className="py-10 text-center text-sm text-ink-muted">
+                  {t('جارٍ تحميل العملاء...', 'Loading clients...')}
+                </TableCell>
+              </TableRow>
+            )}
+
+            {!isLoading && filtered.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="py-10 text-center text-sm text-ink-muted">
+                  {search
+                    ? t('لا توجد نتائج مطابقة للبحث', 'No matching results')
+                    : t('لا يوجد عملاء بعد — حوّل عميلاً محتملاً أو أضف عميلاً جديداً', 'No clients yet')}
+                </TableCell>
+              </TableRow>
+            )}
+
             {filtered.map((client) => (
               <TableRow key={client.id}>
                 <TableCell>

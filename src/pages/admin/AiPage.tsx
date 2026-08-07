@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Sparkles, FileText, Send, Clock, ShieldCheck, AlertCircle, Upload, CheckCircle2 } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { useQuery } from '@tanstack/react-query'
+import { listDocuments } from '../../lib/records'
 import type { Doc } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -14,7 +15,7 @@ export default function AiPage() {
   const { t } = useT()
   useSEO({ title: 'المساعد القانوني الذكي AI | ' + t('مكتب المحاماة', 'Law Firm') })
 
-  const docs = store.getDocuments()
+  const { data: docs = [] } = useQuery({ queryKey: ['documents'], queryFn: listDocuments })
   const [selectedDocId, setSelectedDocId] = useState<string>(docs[0]?.id || '')
   const [prompt, setPrompt] = useState('')
   const [isLoading, setIsLoading] = useState(false)

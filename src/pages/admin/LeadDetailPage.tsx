@@ -15,7 +15,9 @@ import {
   Share2
 } from 'lucide-react'
 import { useT } from '../../lib/i18n'
-import { store } from '../../lib/store'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { listLeads, updateLeadNotes } from '../../lib/store'
+import { convertLeadToClient } from '../../lib/records'
 import { Lead, Activity } from '../../types'
 import { Card } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -31,11 +33,39 @@ export default function LeadDetailPage() {
   const { t, isRTL } = useT()
   const navigate = useNavigate()
 
-  const [lead, setLead] = useState<Lead | undefined>(store.getLead(id || ''))
+  const queryClient = useQueryClient()
   const [newNote, setNewNote] = useState('')
+  const [actionError, setActionError] = useState('')
+
+  const { data: leads = [], isLoading } = useQuery<Lead[]>({ queryKey: ['leads'], queryFn: listLeads })
+  const lead = leads.find((item) => item.id === id)
 
   // يُستدعى دائمًا قبل أي خروج مبكر — الخطافات لا تُستدعى شرطيًا.
   useSEO({ title: lead ? `ملف الطلب ${lead.ref} | ${lead.name}` : 'ملف غير موجود', noindex: true })
+
+  // التحويل يكتب في قاعدة البيانات: عميل جديد + تحديث حالة الطلب إلى "مكتسب".
+  const convert = useMutation({
+    mutationFn: (leadId: string) => convertLeadToClient(leadId),
+    onSuccess: (client) => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] })
+      queryClient.invalidateQueries({ queryKey: ['clients'] })
+      navigate(`/admin/clients/${client.id}`)
+    },
+    onError: (cause) => setActionError(cause instanceof Error ? cause.message : 'تعذر تحويل الطلب'),
+  })
+
+  const saveNote = useMutation({
+    mutationFn: ({ leadId, notes }: { leadId: string; notes: string }) => updateLeadNotes(leadId, notes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] })
+      setNewNote('')
+    },
+    onError: (cause) => setActionError(cause instanceof Error ? cause.message : 'تعذر حفظ الملاحظة'),
+  })
+
+  if (isLoading) {
+    return <div className="p-12 text-center text-ink-muted">{t('جارٍ تحميل الطلب...', 'Loading lead...')}</div>
+  }
 
   if (!lead) {
     return (
@@ -47,20 +77,16 @@ export default function LeadDetailPage() {
   }
 
   const handleConvert = () => {
-    const newClient = store.convertLeadToClient(lead.id)
-    if (newClient) {
-      navigate(`/admin/clients/${newClient.id}`)
-    }
+    setActionError('')
+    convert.mutate(lead.id)
   }
 
   const handleAddNote = () => {
     if (!newNote.trim()) return
-    store.addActivity('lead', lead.id, `إضافة ملاحظة: ${newNote}`, 'أ. محمد')
-    setLead(store.getLead(lead.id))
-    setNewNote('')
+    setActionError('')
+    const merged = lead.notes ? `${lead.notes}\n\n${newNote.trim()}` : newNote.trim()
+    saveNote.mutate({ leadId: lead.id, notes: merged })
   }
-
-  const activities = store.getActivities('lead', lead.id)
 
   return (
     <div className="space-y-6 pb-12">
@@ -135,6 +161,12 @@ export default function LeadDetailPage() {
               {t('سجل الملاحظات والأنشطة', 'Activity Timeline & Notes')}
             </h3>
 
+            {actionError && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 font-medium">
+                {actionError}
+              </div>
+            )}
+
             <div className="space-y-3">
               <Textarea
                 rows={3}
@@ -143,22 +175,15 @@ export default function LeadDetailPage() {
                 placeholder={t('أضف ملاحظة جديدة حول الاتصال أو التقييم...', 'Add internal note...')}
               />
               <div className="flex justify-end">
-                <Button size="sm" onClick={handleAddNote} className="bg-navy text-white">
-                  {t('إضافة الملاحظة', 'Add Note')}
+                <Button
+                  size="sm"
+                  onClick={handleAddNote}
+                  disabled={saveNote.isPending || !newNote.trim()}
+                  className="bg-navy text-white"
+                >
+                  {saveNote.isPending ? t('جارٍ الحفظ...', 'Saving...') : t('إضافة الملاحظة', 'Add Note')}
                 </Button>
               </div>
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-border">
-              {activities.map((act: Activity) => (
-                <div key={act.id} className="p-3.5 rounded-xl bg-surface border border-border/50 text-xs space-y-1">
-                  <p className="text-ink font-medium">{act.text}</p>
-                  <div className="flex justify-between text-[10px] text-ink-muted">
-                    <span>{act.actor}</span>
-                    <span className="font-mono">{act.createdAt}</span>
-                  </div>
-                </div>
-              ))}
             </div>
           </Card>
 
